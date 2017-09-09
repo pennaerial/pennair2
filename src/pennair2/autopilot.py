@@ -22,13 +22,11 @@ class Autopilot(metaclass=ABCMeta):
         self._gps_raw: NavSatFix = None
         self._gps_twist_raw: TwistStamped = None
 
-        self._imu_data: Imu
-        self._imu_data_raw: Imu
+        self._imu_data: Imu = None
+        self._imu_data_raw: Imu = None
 
         self._local_pose: PoseStamped = None
         self._local_twist: TwistStamped = None
-
-        self._waypoints: WaypointList = None
         # endregion
 
     # global_position
@@ -85,6 +83,23 @@ class Autopilot(metaclass=ABCMeta):
         :rtype: TwistStamped
         """
         return deepcopy(self._gps_twist_raw)
+
+    # imu_pub
+    @property
+    def imu_data(self) -> Imu:
+        """
+        :return: Imu data, orientation computed by FCU
+        :rtype: Imu 
+        """
+        return deepcopy(self._imu_data)
+
+    @property
+    def imu_raw(self) -> Imu:
+        """
+        :return: Raw IMU data without orientation
+        :rtype: Imu
+        """
+        return deepcopy(self._imu_data_raw)
 
     # local_position
     @property
