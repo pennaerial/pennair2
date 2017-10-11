@@ -1,5 +1,5 @@
 import rospy
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 from copy import deepcopy
 
 # ROS message imports
@@ -29,7 +29,7 @@ class Autopilot(metaclass=ABCMeta):
         self._local_twist: TwistStamped = None
         # endregion
 
-    # global_position
+    # global_positionW
     @property
     def global_global(self) -> NavSatFix:
         """
@@ -145,10 +145,10 @@ class Mavros(Autopilot):
             self._global_vel_raw = msg
 
         def global_rel_alt_callback(msg: Float64):
-            self.relative_altitude = msg.data
+            self._relative_altitude = msg.data
 
         def global_heading_callback(msg: Float64):
-            self.heading = msg.data
+            self._heading = msg.data
 
         def raw_gps_callback(msg: NavSatFix):
             self._raw_gps = msg
@@ -169,10 +169,10 @@ class Mavros(Autopilot):
             self._local_twist = msg
 
         def state_callback(msg: State):
-            self.state = msg
+            self._state = msg
 
         def battery_callback(msg: BatteryStatus):
-            self.battery = msg
+            self._battery = msg
 
         def waypoints_callback(msg: WaypointList):
             self._waypoints = msg
