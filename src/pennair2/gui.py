@@ -9,7 +9,7 @@ import PIL.ImageTk
 
 
 class GroundStationApp(Frame):
-    def __init__(self, master=None, TODO=None, DONE=None):
+    def __init__(self, master=None):
         super().__init__(master)
 
 
