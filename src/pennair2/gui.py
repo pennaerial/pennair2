@@ -12,15 +12,14 @@ from PIL import Image
 class GroundStationApp:
     def __init__(self, master):
         self.master = master
-        self.current_image_path = "monkey.jpg"
         self.load_image()
 
     def load_image(self):
         self.current_image_path = "monkey.jpg"
-        img = Image.open(self.current_image_path)
-        photo_img = ImageTk.PhotoImage(img)
-        panel = Label(self.master, image=photo_img)
-        panel.pack(side="bottom", fill="both", expand="yes")
+        self.img = Image.open(self.current_image_path)
+        self.photo_img = ImageTk.PhotoImage(self.img)
+        self.panel = Label(self.master, image=self.photo_img)
+        self.panel.pack(side="bottom", fill="both", expand="yes")
 
     def run(self):
         self.master.mainloop()
