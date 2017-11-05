@@ -2,7 +2,7 @@
 class Waypoints():
 
     #Define two fields, empty list of waypoints and index
-    def __init__(self, frame : str):
+    def __init__(self, frame):
         """
         :param frame: coordinate system
         :type frame: str
@@ -49,21 +49,3 @@ class Waypoints():
     #return length
     def length(self):
         return len(self.waypoints)
-
-#TESTING
-points = Waypoints("euclidean")
-points.add([0, 0, 0])
-print(points.waypoints)
-points.add([1, 1, 1])
-print(points.waypoints)
-points.add([2, 2, 2])
-print(points.waypoints)
-points.add([3, 3, 3])
-print(points.waypoints)
-print(points.next())
-print("Length: ", points.length(), " Index: ", points.index)
-print(points.goto(3))
-print(points.next())
-print(points.next())
-points.delete(0)
-print(points.waypoints)
