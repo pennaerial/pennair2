@@ -1,5 +1,7 @@
 import numpy as np
 import quaternion as qt
+import math
+#import servo
 
 class Gimbal:
 	#assuming 3 servos input
@@ -13,8 +15,17 @@ class Gimbal:
 	#expect input of vector
 	#set gimbal to point in direction of vector
 	def gimbal_set_vector(self, vector):
-		pass
-		
+		xy_plane = [1, 1, 0]
+		yz_plane = [0, 1, 1]
+		xz_plane = [1, 0, 1]
+		x_angle = math.acos(np.dot(yz_plane, vector)/(np.linalg.norm(vector)*np.linalg.norm(yz_plane)))
+		y_angle = math.acos(np.dot(xz_plane, vector)/(np.linalg.norm(vector)*np.linalg.norm(xz_plane)))
+		z_angle = math.acos(np.dot(xy_plane, vector)/(np.linalg.norm(vector)*np.linalg.norm(xy_plane)))
+		self.servo_x.set_servo_angle(x_angle)
+		self.servo_y.set_servo_angle(y_angle)
+		self.servo_z.set_servo_angle(z_angle)
+		print([x_angle, y_angle, z_angle])
+
 
 	#input of 2 points, made out of list [x, y, z]
 	#set gimbal to point in that direction
@@ -34,6 +45,7 @@ class Gimbal:
 		state[2] = self.servo_y.get_servo_angle
 		return state
 		
-
+g = Gimbal(None, None, None, 0)
+g.gimbal_set_vector([2 , 3, 1])
 
 
