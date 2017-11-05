@@ -3,18 +3,30 @@ class Waypoints():
 
     #Define two fields, empty list of waypoints and index
     def __init__(self, frame : str):
+        """
+        :param frame: coordinate system
+        :type frame: str
+        """
         self.waypoints = []
         self.index = 0
 
     #add a waypoint by default to the end or at a specified index
-    def add(self, waypoint : list, index = 'unspecified'):
+    def add(self, waypoint, index = 'unspecified'):
+        """
+        :param waypoint: waypoint to add
+        :type waypoint: list
+        """
         if index is 'unspecified':
             self.waypoints.append(waypoint)
         else:
             self.waypoints.insert(index, waypoint)
 
     #delete waypoint at the index
-    def delete(self, index : int):
+    def delete(self, index):
+        """
+        :param index: index to delete
+        :type index: int
+        """
         del self.waypoints[index]
 
     #return waypoint at current index and increment index with wrapping
@@ -26,7 +38,11 @@ class Waypoints():
         return output
 
     #change index and return waypoint at new index
-    def goto(self, index : int):
+    def goto(self, index):
+        """
+        :param index: index to delete
+        :type index: int
+        """
         self.index = index
         return self.waypoints[index]
 
