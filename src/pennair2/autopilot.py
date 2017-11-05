@@ -6,32 +6,30 @@ from copy import deepcopy
 from geometry_msgs.msg import PoseStamped, TwistStamped, PoseWithCovarianceStamped, Vector3Stamped
 from sensor_msgs.msg import NavSatFix, Imu
 from std_msgs.msg import Float64
-from mavros_msgs.msg import WaypointList, State, BatteryStatus
+from mavros_msgs.msg import State, BatteryStatus
 
 
 class Autopilot(metaclass=ABCMeta):
-
     def __init__(self):
-
         # region Private Fields
-        self._global_global: NavSatFix = None
-        self._global_local: PoseStamped = None
-        self._relative_altitude: float = None
-        self._heading: float = None
-        self._global_vel_raw: TwistStamped = None
-        self._gps_raw: NavSatFix = None
-        self._gps_twist_raw: TwistStamped = None
+        self._global_global = None  # type: NavSatFix
+        self._global_local = None  # type: PoseStamped
+        self._relative_altitude = None  # type: float
+        self._heading = None  # type: float
+        self._global_vel_raw = None  # type: TwistStamped
+        self._gps_raw = None  # type: NavSatFix
+        self._gps_twist_raw = None  # type: TwistStamped
 
-        self._imu_data: Imu = None
-        self._imu_data_raw: Imu = None
+        self._imu_data = None  # type: Imu
+        self._imu_data_raw = None  # type: Imu
 
-        self._local_pose: PoseStamped = None
-        self._local_twist: TwistStamped = None
+        self._local_pose = None  # type: PoseStamped
+        self._local_twist = None  # type: TwistStamped
         # endregion
 
     # global_positionW
     @property
-    def global_global(self) -> NavSatFix:
+    def global_global(self):
         """
         The global position as a GPS coordinate.
         :return: GPS position.
@@ -40,7 +38,7 @@ class Autopilot(metaclass=ABCMeta):
         return deepcopy(self._global_global)
 
     @property
-    def global_local(self) -> PoseStamped:
+    def global_local(self):
         """
         The global position in UTM coordinates.
         UTM coordinates are used to define position on Earth using a Euclidean coordinate system.
@@ -50,7 +48,7 @@ class Autopilot(metaclass=ABCMeta):
         return deepcopy(self._global_local)
 
     @property
-    def global_velocity_raw(self) -> TwistStamped:
+    def global_velocity_raw(self):
         """
         The raw GPS velocity.
         :return: GPS velocity
@@ -59,15 +57,23 @@ class Autopilot(metaclass=ABCMeta):
         return deepcopy(self._global_vel_raw)
 
     @property
-    def relative_altitude(self) -> float:
+    def relative_altitude(self):
+        """
+        :return: The relative altitude to home.
+        :rtype: float
+        """
         return self._relative_altitude
 
     @property
-    def heading(self) -> float:
+    def heading(self):
+        """
+        :return: The heading.
+        :rtype: float
+        """
         return self._heading
 
     @property
-    def gps_raw(self) -> NavSatFix:
+    def gps_raw(self):
         """
         Raw GPS position data.
         :return: raw GPS data
@@ -76,7 +82,7 @@ class Autopilot(metaclass=ABCMeta):
         return deepcopy(self._gps_raw)
 
     @property
-    def gps_twist_raw(self) -> TwistStamped:
+    def gps_twist_raw(self):
         """
         Raw GPS velocity data.
         :return: raw GPS velocity
@@ -86,7 +92,7 @@ class Autopilot(metaclass=ABCMeta):
 
     # imu_pub
     @property
-    def imu_data(self) -> Imu:
+    def imu_data(self):
         """
         :return: Imu data, orientation computed by FCU
         :rtype: Imu 
@@ -94,7 +100,7 @@ class Autopilot(metaclass=ABCMeta):
         return deepcopy(self._imu_data)
 
     @property
-    def imu_raw(self) -> Imu:
+    def imu_raw(self):
         """
         :return: Raw IMU data without orientation
         :rtype: Imu
@@ -103,7 +109,7 @@ class Autopilot(metaclass=ABCMeta):
 
     # local_position
     @property
-    def local_pose(self) -> PoseStamped:
+    def local_pose(self):
         """
         Fused position in local reference frame, as defined in ~local_position/frame_id
         :return: Local position
@@ -112,7 +118,7 @@ class Autopilot(metaclass=ABCMeta):
         return deepcopy(self._local_pose)
 
     @property
-    def local_twist(self) -> TwistStamped:
+    def local_twist(self):
         """
         Fused linear and angular velocity from the FCU.
         :return: velocity
@@ -122,59 +128,64 @@ class Autopilot(metaclass=ABCMeta):
 
 
 class Mavros(Autopilot):
-    def __init__(self, mavros_prefix: str = "/mavros/"):
-        super().__init__()
+    def __init__(self, mavros_prefix="/mavros/"):
+        """
 
+        :param mavros_prefix: The mavros prefix.
+        :type mavros_prefix: str
+        """
+        Autopilot.__init__(self)
         if not mavros_prefix.endswith("/"):
             mavros_prefix += "/"
 
         # region Private Fields
-        self._state = None
-        self._battery = None
+        self._state = None  # type: State
+        self._battery = None  # type: BatteryStatus
+
         # endregion
 
         # region Subscriber Callbacks
 
-        def global_global_callback(msg: NavSatFix):
+        def global_global_callback(msg):
             self._global_global = msg
 
-        def global_local_callback(msg: PoseStamped):
+        def global_local_callback(msg):
             self._global_local = msg
 
-        def global_vel_callback(msg: TwistStamped):
+        def global_vel_callback(msg):
             self._global_vel_raw = msg
 
-        def global_rel_alt_callback(msg: Float64):
+        def global_rel_alt_callback(msg):
             self._relative_altitude = msg.data
 
-        def global_heading_callback(msg: Float64):
+        def global_heading_callback(msg):
             self._heading = msg.data
 
-        def raw_gps_callback(msg: NavSatFix):
+        def raw_gps_callback(msg):
             self._raw_gps = msg
 
-        def raw_gps_twist_callback(msg: TwistStamped):
+        def raw_gps_twist_callback(msg):
             self._raw_gps_twist = msg
 
-        def imu_data_callback(msg: Imu):
+        def imu_data_callback(msg):
             self._imu_data = msg
 
-        def imu_data_raw_callback(msg: Imu):
+        def imu_data_raw_callback(msg):
             self._imu_data_raw = msg
 
-        def local_pose_callback(msg: PoseStamped):
+        def local_pose_callback(msg):
             self._local_pose = msg
 
-        def local_twist_callback(msg: TwistStamped):
+        def local_twist_callback(msg):
             self._local_twist = msg
 
-        def state_callback(msg: State):
+        def state_callback(msg):
             self._state = msg
 
-        def battery_callback(msg: BatteryStatus):
+        def battery_callback(msg):
             self._battery = msg
 
-        def waypoints_callback(msg: WaypointList):
+        def waypoints_callback(msg):
             self._waypoints = msg
 
         # endregion
@@ -208,7 +219,7 @@ class Mavros(Autopilot):
         # endregion
 
     @property
-    def state(self) -> State:
+    def state(self):
         """
         The state of the autopilot. Includes things like current mode.
         :return: Mavros state
@@ -217,7 +228,7 @@ class Mavros(Autopilot):
         return deepcopy(self.state)
 
     @property
-    def battery(self) -> BatteryStatus:
+    def battery(self):
         """
         The status of the battery. This has to be properly configured in QGroundControl to be reliable.
         :return: Battery status
