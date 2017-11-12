@@ -1,14 +1,15 @@
+from autopilot import Mavros
+
 
 class Servo(Mavros):
 
-    def __init__(self, servo_port, servo_min, servo_max, init_angle):
+    def __init__(self, servo_port, servo_min, servo_max):
         super(Servo, self).__init__()
         self.servo_port = servo_port
         self.servo_min = servo_min
         self.servo_max = servo_max
-        self.angle = init_angle
+        self.angle = 0
         self.pwm = 1000
-        self.set_pwm()
 
     def set_servo_angle(self, angle):
         self.angle = min(self.servo_max, max(self.servo_min, angle))
@@ -23,4 +24,4 @@ class Servo(Mavros):
         self.pwm = min(2000, max(1000, freq))
 
     def __set_servo(self):
-        super(Servo, self).send_command_long(183, [183, self.pwm])
+        super(Servo, self).send_command_long(183, [self.servo_port, self.pwm])
