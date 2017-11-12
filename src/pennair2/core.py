@@ -2,12 +2,22 @@ from .autopilot import Autopilot
 from abc import ABCMeta, abstractmethod
 
 class UAV:
-    def __init__(self, autopilot: Autopilot, metaclass=ABCMeta):
-        self.autopilot: Autopilot = autopilot
+    def __init__(self, autopilot, metaclass=ABCMeta):
+        """
+
+        :param autopilot: An autopilot object to use.
+        :type autopilot: Autopilot
+        """
+        self.autopilot = autopilot
 
 class Multirotor(UAV):
-    def __init__(self, autopilot: Autopilot):
-        super().__init__(autopilot)
+    def __init__(self, autopilot):
+        """
+
+        :param autopilot: The autopilot object to use.
+        :type autopilot: Autopilot
+        """
+        UAV.__init__(self, autopilot)
 
         self._pos_setpoint = None
         self._vel_setpoint = None
