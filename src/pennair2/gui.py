@@ -9,19 +9,19 @@ try:
     from PIL import ImageTk
     from PIL import Image
     import googlemaps
+    from staticmap import StaticMap
 except ImportError:
     exit()
 
 
 class GroundStationApp:
-    def __init__(self, master, map_width, map_height):
+    def __init__(self, master):
         self.master = master
         self.initialize_image()
         self.create_altitude_widget()
         self.create_speed_widget()
         self.map_coordinates = (39.9526, 75.1652)
-        self.map_width = map_width
-        self.map_height = map_height
+        self.load_image()
 
     def initialize_image(self):
         self.current_image_path = "monkey.jpg"
@@ -41,7 +41,9 @@ class GroundStationApp:
         self.altitude_widget.grid(row=0, column=1)
 
     def load_image(self):
-        pass
+        self.map = None
+        #This static map library will load map positions
+        #self.map = StaticMap(width, height, padding_x, padding_y, url_template, tile_size)
 
     def run(self):
         self.master.mainloop()
