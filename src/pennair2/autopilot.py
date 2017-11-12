@@ -7,6 +7,7 @@ from geometry_msgs.msg import PoseStamped, TwistStamped, PoseWithCovarianceStamp
 from sensor_msgs.msg import NavSatFix, Imu
 from std_msgs.msg import Float64
 from mavros_msgs.msg import State, BatteryStatus
+from mavros_msgs.srv import CommandLong, CommandInt, CommandLongRequest, CommandIntRequest
 
 
 class Autopilot(metaclass=ABCMeta):
@@ -95,7 +96,7 @@ class Autopilot(metaclass=ABCMeta):
     def imu_data(self):
         """
         :return: Imu data, orientation computed by FCU
-        :rtype: Imu 
+        :rtype: Imu
         """
         return deepcopy(self._imu_data)
 
@@ -216,6 +217,9 @@ class Mavros(Autopilot):
         self.throttle_pub = rospy.Publisher(mavros_prefix + "setpoint_attitude/att_throttle", Float64, queue_size=1)
         self.position_pub = rospy.Publisher(mavros_prefix + "setpoint_position/local", PoseStamped, queue_size=1)
         self.velocity_pub = rospy.Publisher(mavros_prefix + "setpoitn_velocity/cmd_vel", TwistStamped, queue_size=1)
+
+        self.command_long_srv = rospy.ServiceProxy(mavros_prefix + 'cmd/Command', CommandLong)
+        self.command_int_srv = rospy.ServiceProxy(mavros_prefix + 'cmd/CommandInt', CommandInt)
         # endregion
 
     @property
@@ -235,3 +239,28 @@ class Mavros(Autopilot):
         :rtype: BatteryStatus
         """
         return deepcopy(self.battery)
+
+    def send_command_long(self, cmd, params):
+        """
+        Send a raw MAVLINK command.
+        :param cmd: The command number.
+        :type cmd: int
+        :param params: A list of parameters to send in the command.
+        :type params: int list
+        :return: A boolean that specifies success and an integer specifying the result.
+        :rtype: (bool, int)
+        """
+        request = CommandLongRequest()
+        request.command = cmd
+
+        for i in range(min(len(params), 7)):
+            setattr(request, "param" + str(i+1), params[i])
+
+        try:
+            rsp = self.command_long_srv(request)
+            return rsp.success, rsp.result
+        except rospy.ServiceException as e:
+            return False, None
+
+
+
