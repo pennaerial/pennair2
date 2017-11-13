@@ -192,34 +192,34 @@ class Mavros(Autopilot):
         # endregion
 
         # region Subscribers
-        rospy.Subscriber(mavros_prefix + "global_position/global", NavSatFix, global_global_callback)
-        rospy.Subscriber(mavros_prefix + "global_position/local", PoseWithCovarianceStamped, global_local_callback)
-        rospy.Subscriber(mavros_prefix + "global_position/gp_vel", TwistStamped, global_vel_callback)
-        rospy.Subscriber(mavros_prefix + "global_position/rel_alt", Float64, global_rel_alt_callback)
-        rospy.Subscriber(mavros_prefix + "global_position/compass_hdg", Float64, global_heading_callback)
-        rospy.Subscriber(mavros_prefix + "global_position/raw/fix", NavSatFix, raw_gps_callback)
-        rospy.Subscriber(mavros_prefix + "global_position/raw/gps", TwistStamped, raw_gps_twist_callback)
+        rospy.Subscriber(mavros_prefix + "/global_position/global", NavSatFix, global_global_callback)
+        rospy.Subscriber(mavros_prefix + "/global_position/local", PoseWithCovarianceStamped, global_local_callback)
+        rospy.Subscriber(mavros_prefix + "/global_position/gp_vel", TwistStamped, global_vel_callback)
+        rospy.Subscriber(mavros_prefix + "/global_position/rel_alt", Float64, global_rel_alt_callback)
+        rospy.Subscriber(mavros_prefix + "/global_position/compass_hdg", Float64, global_heading_callback)
+        rospy.Subscriber(mavros_prefix + "/global_position/raw/fix", NavSatFix, raw_gps_callback)
+        rospy.Subscriber(mavros_prefix + "/global_position/raw/gps", TwistStamped, raw_gps_twist_callback)
 
-        rospy.Subscriber(mavros_prefix + "imu/data", Imu, imu_data_callback)
-        rospy.Subscriber(mavros_prefix + "imu/data_raw", Imu, imu_data_raw_callback)
+        rospy.Subscriber(mavros_prefix + "/imu/data", Imu, imu_data_callback)
+        rospy.Subscriber(mavros_prefix + "/imu/data_raw", Imu, imu_data_raw_callback)
 
-        rospy.Subscriber(mavros_prefix + "local_position/pose", PoseStamped, local_pose_callback)
-        rospy.Subscriber(mavros_prefix + "local_position/velocity", TwistStamped, local_twist_callback)
+        rospy.Subscriber(mavros_prefix + "/local_position/pose", PoseStamped, local_pose_callback)
+        rospy.Subscriber(mavros_prefix + "/local_position/velocity", TwistStamped, local_twist_callback)
 
-        rospy.Subscriber(mavros_prefix + "state", State, state_callback)
-        rospy.Subscriber(mavros_prefix + "battery", BatteryStatus, battery_callback)
+        rospy.Subscriber(mavros_prefix + "/state", State, state_callback)
+        rospy.Subscriber(mavros_prefix + "/battery", BatteryStatus, battery_callback)
         # endregion
 
         # region Publishers
-        self.acceleration_pub = rospy.Publisher(mavros_prefix + "setpoint_accel/accel", Vector3Stamped, queue_size=1)
-        self.ang_velocity_pub = rospy.Publisher(mavros_prefix + "setpoint_attitude/cmd_vel", TwistStamped, queue_size=1)
-        self.attitude_pub = rospy.Publisher(mavros_prefix + "setpoint_attitude/attitude", PoseStamped, queue_size=1)
-        self.throttle_pub = rospy.Publisher(mavros_prefix + "setpoint_attitude/att_throttle", Float64, queue_size=1)
-        self.position_pub = rospy.Publisher(mavros_prefix + "setpoint_position/local", PoseStamped, queue_size=1)
-        self.velocity_pub = rospy.Publisher(mavros_prefix + "setpoitn_velocity/cmd_vel", TwistStamped, queue_size=1)
+        self.acceleration_pub = rospy.Publisher(mavros_prefix + "/setpoint_accel/accel", Vector3Stamped, queue_size=1)
+        self.ang_velocity_pub = rospy.Publisher(mavros_prefix + "/setpoint_attitude/cmd_vel", TwistStamped, queue_size=1)
+        self.attitude_pub = rospy.Publisher(mavros_prefix + "/setpoint_attitude/attitude", PoseStamped, queue_size=1)
+        self.throttle_pub = rospy.Publisher(mavros_prefix + "/setpoint_attitude/att_throttle", Float64, queue_size=1)
+        self.position_pub = rospy.Publisher(mavros_prefix + "/setpoint_position/local", PoseStamped, queue_size=1)
+        self.velocity_pub = rospy.Publisher(mavros_prefix + "/setpoitn_velocity/cmd_vel", TwistStamped, queue_size=1)
 
-        self.command_long_srv = rospy.ServiceProxy(mavros_prefix + 'cmd/Command', CommandLong)
-        self.command_int_srv = rospy.ServiceProxy(mavros_prefix + 'cmd/CommandInt', CommandInt)
+        self.command_long_srv = rospy.ServiceProxy(mavros_prefix + "/cmd/Command", CommandLong)
+        self.command_int_srv = rospy.ServiceProxy(mavros_prefix + "/cmd/CommandInt", CommandInt)
         # endregion
 
     @property
