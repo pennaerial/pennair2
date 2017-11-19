@@ -10,7 +10,9 @@ from mavros_msgs.msg import State, BatteryStatus
 from mavros_msgs.srv import CommandLong, CommandInt, CommandLongRequest, CommandIntRequest
 
 
-class Autopilot(metaclass=ABCMeta):
+class Autopilot:
+    __metaclass__ = ABCMeta
+    
     def __init__(self):
         # region Private Fields
         self._global_global = None  # type: NavSatFix
