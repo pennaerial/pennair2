@@ -12,12 +12,12 @@ class Servo(Mavros):
         self.pwm = 1000
         self.angle = init_angle
         self.pwm = 1000
-        self.set_pwm()
+        self.__set_pwm()
 
     def set_servo_angle(self, angle):
         self.angle = min(self.servo_max, max(self.servo_min, angle))
-        self.set_pwm()
-        self.set_servo()
+        self.__set_pwm()
+        self.__set_servo()
 
     def get_servo_angle(self):
         return self.angle
