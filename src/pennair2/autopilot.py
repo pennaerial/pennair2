@@ -12,7 +12,7 @@ from mavros_msgs.srv import CommandLong, CommandInt, CommandLongRequest, Command
 
 class Autopilot:
     __metaclass__ = ABCMeta
-    
+
     def __init__(self):
         # region Private Fields
         self._global_global = None  # type: NavSatFix
@@ -131,15 +131,13 @@ class Autopilot:
 
 
 class Mavros(Autopilot):
-    def __init__(self, mavros_prefix="/mavros/"):
+    def __init__(self, mavros_prefix="/mavros"):
         """
 
         :param mavros_prefix: The mavros prefix.
         :type mavros_prefix: str
         """
         Autopilot.__init__(self)
-        if not mavros_prefix.endswith("/"):
-            mavros_prefix += "/"
 
         # region Private Fields
         self._state = None  # type: State
