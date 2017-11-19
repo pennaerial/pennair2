@@ -32,9 +32,9 @@ class Gimbal:
 			zx_angle = 0
 
 		if not self.testmode:
-			self.servo_xy.set_servo_angle(x_angle)
-			self.servo_yz.set_servo_angle(y_angle)
-			self.servo_zx.set_servo_angle(z_angle)
+			self.servo_xy.set_servo_angle(xy_angle)
+			self.servo_yz.set_servo_angle(yz_angle)
+			self.servo_zx.set_servo_angle(zx_angle)
 		return (xy_angle, yz_angle, zx_angle)
 
 
