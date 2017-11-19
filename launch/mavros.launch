@@ -1,0 +1,24 @@
+<launch>
+	<!-- vim: set ft=xml noet : -->
+	<!-- base node launch file-->
+
+	<arg name="fcu_url" default="/dev/ttyACM0:57600"/>
+	<arg name="gcs_url" default="udp://@10.42.0.1"/>
+	<arg name="tgt_system" default="1"/>
+	<arg name="tgt_component" default="1"/>
+	<arg name="pluginlists_yaml" default="$(find osprey)/launch/px4_pluginlists.yaml"/>
+	<arg name="config_yaml" default="$(find osprey)/launch/px4_config.yaml"/>
+	<arg name="log_output" default="screen" />
+	<arg name="name" default="mavros" />
+
+	<node pkg="mavros" type="mavros_node" name="$(arg name)" required="true" clear_params="true" output="$(arg log_output)">
+		<param name="fcu_url" value="$(arg fcu_url)" />
+		<param name="gcs_url" value="$(arg gcs_url)" />
+		<param name="target_system_id" value="$(arg tgt_system)" />
+		<param name="target_component_id" value="$(arg tgt_component)" />
+		<param name="system_id" value="34" />
+		<!-- load blacklist, config -->
+		<rosparam command="load" file="$(arg pluginlists_yaml)" />
+		<rosparam command="load" file="$(arg config_yaml)" />
+	</node>
+</launch>
