@@ -1,10 +1,13 @@
 from .autopilot import Autopilot
 from abc import ABCMeta, abstractmethod
+from math import pi
+from timeit import default_timer as timer
 
 import rospy
 from mavros_msgs.srv import CommandTOL
 from sensor_msgs.msg import NavSatFix
 from geometry_msgs.msg import TwistStamped, Twist, Vector3
+from std_msgs.msg import Float64
 
 
 class UAV:
@@ -30,17 +33,28 @@ class Multirotor(UAV):
         self._acc_setpoint = None
 
 
-        self._position = None
-
-
-    def takeoff(self, max_angle):
+    def takeoff(self, takeoff_height=1.0, min_time= 1, max_time= 5): #Min and Max Time(s) it take for the quad to take off
         print("Attempting Takeoff")
         msg = TwistStamped()
-        msg.Twist.linear = Vector3(0, 0, 0.5)
+        msg.Twist.linear = Vector3(0, 0, 0.25)
         self.velocity = msg
 
+        start = timer()
+        time_elapsed = 0
+        while(time_elapsed < max_time):
+            time_elapsed = timer() - start
+            if (self.autopilot.relative_altitude.data > takeoff_height and time_elapsed > min_time):
+                break
+
+        msg = TwistStamped()
+        msg.Twist.linear = Vector3(0, 0, 0)
+        self.velocity = msg
+
+
     def land(self):
-        raise NotImplementedError
+        msg = TwistStamped()
+        msg.Twist.linear = Vector3(0, 0, -0.25)
+        self.velocity = msg
 
     def yaw(self):
         raise NotImplementedError
@@ -51,11 +65,12 @@ class Multirotor(UAV):
 
     @position.setter
     def position(self, value):
-        try:
-            if type(value) is PoseStamped:
-                self.autopilot.velocity_pub.publish(value)
-            else:
-                print("Error while setting position: Value is not PoseStamped")
+        if type(value) is PoseStamped:
+            self._pos_setpoint = value
+            self.autopilot.position_pub.publish(value)
+        else:
+            print("Error while setting position: Value is not PoseStamped")
+
 
     @property
     def velocity(self):
@@ -63,8 +78,8 @@ class Multirotor(UAV):
 
     @velocity.setter
     def velocity(self, value):
-        try:
-            if type(value) is TwistStamped:
-                self.autopilot.velocity_pub.publish(value)
-            else:
-                print("Error while setting velocity: Value is not TwistStamped")
+        if type(value) is TwistStamped:
+            self._vel_setpoint = value
+            self.autopilot.velocity_pub.publish(value)
+        else:
+            print("Error while setting velocity: Value is not TwistStamped")
