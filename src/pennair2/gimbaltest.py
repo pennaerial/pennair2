@@ -1,7 +1,8 @@
 import unittest
 from gimbal import Gimbal
 from pyquaternion import Quaternion
-#from servo import Servo
+from servo import Servo
+from servo import Servo
 from math import pi
 import numpy as np
 import math

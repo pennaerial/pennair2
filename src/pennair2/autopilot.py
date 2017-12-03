@@ -139,6 +139,9 @@ class Mavros(Autopilot):
         """
         Autopilot.__init__(self)
 
+        if not mavros_prefix.endswith("/"):
+            mavros_prefix += "/"
+
         # region Private Fields
         self._state = None  # type: State
         self._battery = None  # type: BatteryStatus
@@ -166,7 +169,7 @@ class Mavros(Autopilot):
             self._raw_gps = msg
 
         def raw_gps_twist_callback(msg):
-            self._raw_gps_twist = msgint()
+            self._raw_gps_twist = msg
 
         def imu_data_callback(msg):
             self._imu_data = msg

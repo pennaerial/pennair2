@@ -4,6 +4,7 @@ from time import sleep
 
 
 if __name__=="__main__":
+
 	seconds = 1
 
 	print("make servo")
@@ -28,5 +29,11 @@ if __name__=="__main__":
 
 	print("rotation 5")
 	test.set_servo_angle(pi+1)
+
+	test = Servo(1, 0, pi, pi/2)
+	sleep(3)
+	test.set_servo_angle(pi/4)
+	sleep(3)
+	test.set_servo_angle(3*pi/2)
 
 
