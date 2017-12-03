@@ -166,7 +166,7 @@ class Mavros(Autopilot):
             self._raw_gps = msg
 
         def raw_gps_twist_callback(msg):
-            self._raw_gps_twist = msg
+            self._raw_gps_twist = msgint()
 
         def imu_data_callback(msg):
             self._imu_data = msg
