@@ -1,5 +1,5 @@
 import numpy as np
-import quaternion as qt
+import pyquaternion as qt
 import math
 #from servo import Servo
 
