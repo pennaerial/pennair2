@@ -8,6 +8,7 @@ except ImportError:
 try:
     from PIL import ImageTk
     from PIL import Image
+    import requests
     import googlemaps
     from staticmap import StaticMap, CircleMarker
 except ImportError:
@@ -17,17 +18,17 @@ except ImportError:
 class GroundStationApp:
     def __init__(self, master):
         self.master = master
+        self.map_coordinates = (-75.165222, 39.952583)
         self.render_image()
         self.initialize_image()
         self.create_altitude_widget()
         self.create_speed_widget()
-        self.map_coordinates = (39.9526, 75.1652)
-        self.load_image()
+        # self.load_image()
 
     def initialize_image(self):
-        self.current_image_path = "monkey.jpg"
+        self.current_image_path = "map.png"
         self.img = Image.open(self.current_image_path)
-        self.photo_img = ImageTk.PhotoImage(self.img)
+        self.photo_img = ImageTk .PhotoImage(self.img)
         self.panel = Label(self.master, image=self.photo_img)
         self.panel.grid(row=1, column=0, columnspan=2)
 
@@ -48,11 +49,11 @@ class GroundStationApp:
 
     # This method renders the images
     def render_image(self):
-        self.static_map = StaticMap(width=300, height=300, url_template='http://a.tile.osm.org/{z}/{x}/{y}.png')
-        self.drone_marker = CircleMarker((39.952583, -75.165222), '#0036FF', 12)
+        self.static_map = StaticMap(700, 700)#, url_template='http://a.tile.osm.org/{z}/{x}/{y}.png')
+        self.drone_marker = CircleMarker(self.map_coordinates, '#0036FF', 12)
         self.static_map.add_marker(self.drone_marker)
-        image = self.static_map.render()
-        image.save('map.png')
+        self.image = self.static_map.render(zoom=12)
+        self.image.save('map.png')
 
     def run(self):
         self.master.mainloop()
