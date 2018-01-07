@@ -26,9 +26,9 @@ class GroundStationApp:
         # self.load_image()
 
     def initialize_image(self):
-        self.current_image_path = "map.png"
-        self.img = Image.open(self.current_image_path)
-        self.photo_img = ImageTk .PhotoImage(self.img)
+        #self.current_image_path = "map.png"
+        #self.img = Image.open(self.current_image_path)
+        self.photo_img = ImageTk.PhotoImage(self.image)
         self.panel = Label(self.master, image=self.photo_img)
         self.panel.grid(row=1, column=0, columnspan=2)
 
@@ -53,7 +53,7 @@ class GroundStationApp:
         self.drone_marker = CircleMarker(self.map_coordinates, '#0036FF', 12)
         self.static_map.add_marker(self.drone_marker)
         self.image = self.static_map.render(zoom=12)
-        self.image.save('map.png')
+        #self.image.save('map.png')
 
     def run(self):
         self.master.mainloop()
