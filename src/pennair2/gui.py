@@ -10,7 +10,7 @@ try:
     from PIL import Image
     import requests
     import googlemaps
-    from staticmap import StaticMap, CircleMarker
+    from staticmap import StaticMap, CircleMarker, Line
 except ImportError:
     exit()
 
@@ -20,6 +20,7 @@ class GroundStationApp:
         self.master = master
         self.map_coordinates = (drone_latitude, drone_longitude)
         self.obstacles = []
+        self.boundaries = []
         self.altitude_value = 0
         self.speed_value = 0
         self.refresh_map()
@@ -28,6 +29,16 @@ class GroundStationApp:
         self.create_speed_widget()
         self.create_speed_value_widget()
         self.create_speed_value_widget()
+
+    def add_boundary(self, start_long, start_lat, end_long, end_lat):
+        self.boundaries.append(Line(((start_long, start_lat), (end_long, end_lat)), 'blue', 3))
+        self.panel.grid(row=1, column=0, columnspan=4)
+
+    def add_obstacle(self, long, lat):
+        self.obstacles.append(CircleMarker((long, lat), 'red', 12))
+
+    def create_altitude_widget(self):
+        self.altitude_widget = Label(self.master, text="Altitude:")
 
     def refresh_map(self):
         self.render_image()
@@ -38,10 +49,6 @@ class GroundStationApp:
         #self.img = Image.open(self.current_image_path)
         self.photo_img = ImageTk.PhotoImage(self.image)
         self.panel = Label(self.master, image=self.photo_img)
-        self.panel.grid(row=1, column=0, columnspan=4)
-
-    def create_altitude_widget(self):
-        self.altitude_widget = Label(self.master, text="Altitude:")
         self.altitude_widget.config(font=("Arial", 24))
         self.altitude_widget.grid(row=0, column=0)
 
@@ -76,6 +83,7 @@ class GroundStationApp:
 def main():
     root = Tk()
     app = GroundStationApp(root, -75.165222, 39.952583)
+    app.add_boundary(-75.165200, 39.952500, -75.165300, 39.952600)
     app.run()
 
 
