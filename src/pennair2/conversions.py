@@ -1,3 +1,5 @@
+import tf2_ros
+
 def feet_to_meters():
     raise NotImplemented
 
