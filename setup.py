@@ -9,4 +9,4 @@ setup_args = generate_distutils_setup(
         package_dir={'': 'src'},
         )
 
-setup(requires=['numpy'], **setup_args)
+setup(requires=['numpy', 'rospy', 'rospkg'], **setup_args)
