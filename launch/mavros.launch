@@ -2,7 +2,7 @@
 	<!-- vim: set ft=xml noet : -->
 	<!-- base node launch file-->
 
-	<arg name="fcu_url" default="/dev/ttyACM0:57600"/>
+	<arg name="fcu_url" default="udp://:14540@127.0.0.1:14557"/>
 	<arg name="gcs_url" default="udp://@10.42.0.1"/>
 	<arg name="tgt_system" default="1"/>
 	<arg name="tgt_component" default="1"/>
