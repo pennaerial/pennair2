@@ -1,5 +1,5 @@
 import rospy
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from copy import deepcopy
 
 # ROS message imports
@@ -8,7 +8,9 @@ from sensor_msgs.msg import NavSatFix, Imu
 from std_msgs.msg import Float64
 from mavros_msgs.msg import State, BatteryStatus
 from mavros_msgs.srv import CommandLong, CommandInt, CommandLongRequest, CommandIntRequest
-
+import launch
+from roslaunch.scriptapi import ROSLaunch
+from roslaunch.core import Node
 
 class Autopilot:
     __metaclass__ = ABCMeta
@@ -120,6 +122,14 @@ class Autopilot:
         """
         return deepcopy(self._local_pose)
 
+    @local_pose.setter
+    def local_pose(self, val):
+        self._local_pose_setter(val)
+
+    @abstractmethod
+    def _local_pose_setter(self, val):
+        pass
+
     @property
     def local_twist(self):
         """
@@ -128,6 +138,14 @@ class Autopilot:
         :rtype: TwistStamped
         """
         return deepcopy(self._local_twist)
+
+    @local_twist.setter
+    def local_twist(self, val):
+        self._local_twist_setter(val)
+
+    @abstractmethod
+    def _local_twist_setter(self, val):
+        pass
 
 
 class Mavros(Autopilot):
@@ -142,6 +160,7 @@ class Mavros(Autopilot):
         # region Private Fields
         self._state = None  # type: State
         self._battery = None  # type: BatteryStatus
+        self.mavros_prefix = mavros_prefix  # type: str
 
         # endregion
 
@@ -212,7 +231,8 @@ class Mavros(Autopilot):
 
         # region Publishers
         self.acceleration_pub = rospy.Publisher(mavros_prefix + "/setpoint_accel/accel", Vector3Stamped, queue_size=1)
-        self.ang_velocity_pub = rospy.Publisher(mavros_prefix + "/setpoint_attitude/cmd_vel", TwistStamped, queue_size=1)
+        self.ang_velocity_pub = rospy.Publisher(mavros_prefix + "/setpoint_attitude/cmd_vel", TwistStamped,
+                                                queue_size=1)
         self.attitude_pub = rospy.Publisher(mavros_prefix + "/setpoint_attitude/attitude", PoseStamped, queue_size=1)
         self.throttle_pub = rospy.Publisher(mavros_prefix + "/setpoint_attitude/att_throttle", Float64, queue_size=1)
         self.position_pub = rospy.Publisher(mavros_prefix + "/setpoint_position/local", PoseStamped, queue_size=1)
@@ -229,7 +249,7 @@ class Mavros(Autopilot):
         :return: Mavros state
         :rtype: State
         """
-        return deepcopy(self.state)
+        return deepcopy(self._state)
 
     @property
     def battery(self):
@@ -238,7 +258,7 @@ class Mavros(Autopilot):
         :return: Battery status
         :rtype: BatteryStatus
         """
-        return deepcopy(self.battery)
+        return deepcopy(self._battery)
 
     def send_command_long(self, cmd, params):
         """
@@ -254,7 +274,7 @@ class Mavros(Autopilot):
         request.command = cmd
 
         for i in range(min(len(params), 7)):
-            setattr(request, "param" + str(i+1), params[i])
+            setattr(request, "param" + str(i + 1), params[i])
 
         try:
             rsp = self.command_long_srv(request)
@@ -262,5 +282,29 @@ class Mavros(Autopilot):
         except rospy.ServiceException as e:
             return False, None
 
+    def _local_pose_setter(self, val):
+        self.position_pub.publish(val)
 
+    def _local_twist_setter(self, val):
+        self.velocity_pub.publish(val)
 
+    def launch_node(self, roslaunch, fcu_url="udp://:14540@127.0.0.1:14557", gcs_url="udp://@10.42.0.1", remap_args=None):
+        """
+        Launch a mavros node corresponding to the appropriate
+        :param remap_args: Additional arguments to pass to the launch file
+        :type remap_args: dict[str,str]
+        :param fcu_url: The url of the flight control unit.
+        :type fcu_url: str
+        :param gcs_url: The url of the ground station (qGroundControl) for passthrough.
+        :type gcs_url: str
+        :param roslaunch: An instance of ROSLaunch that allows the running of nodes.
+        :type roslaunch:  ROSLaunch
+        """
+        node = Node("pennair2", "mavros.launch")
+        if remap_args is not None:
+            node.remap_args += remap_args.items()
+
+        node.remap_args += [("name", self.mavros_prefix),
+                            ("fcu_url", fcu_url),
+                            ("gcs_url", gcs_url)]
+        roslaunch.launch(node)
