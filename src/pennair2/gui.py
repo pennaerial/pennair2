@@ -23,12 +23,12 @@ class GroundStationApp:
         self.boundaries = []
         self.altitude_value = 0
         self.speed_value = 0
-        self.refresh_map()
         self.create_altitude_widget()
         self.create_altitude_value_widget()
         self.create_speed_widget()
         self.create_speed_value_widget()
         self.create_speed_value_widget()
+        self.refresh_map()
 
     def add_boundary(self, start_long, start_lat, end_long, end_lat):
         self.boundaries.append(Line(((start_long, start_lat), (end_long, end_lat)), 'blue', 3))
@@ -53,19 +53,19 @@ class GroundStationApp:
         self.altitude_widget.grid(row=0, column=0)
 
     def create_altitude_value_widget(self):
-        self.altitude_widget = Label(self.master, text=str(self.altitude_value))
-        self.altitude_widget.config(font=("Arial", 24))
-        self.altitude_widget.grid(row=0, column=1)
+        self.altitude_value_widget = Label(self.master, text=str(self.altitude_value))
+        self.altitude_value_widget.config(font=("Arial", 24))
+        self.altitude_value_widget.grid(row=0, column=1)
 
     def create_speed_widget(self):
-        self.altitude_widget = Label(self.master, text="Speed:")
-        self.altitude_widget.config(font=("Arial", 24))
-        self.altitude_widget.grid(row=0, column=2)
+        self.speed_widget = Label(self.master, text="Speed:")
+        self.speed_widget.config(font=("Arial", 24))
+        self.speed_widget.grid(row=0, column=2)
 
     def create_speed_value_widget(self):
-        self.altitude_widget = Label(self.master, text=str(self.speed_value))
-        self.altitude_widget.config(font=("Arial", 24))
-        self.altitude_widget.grid(row=0, column=3)
+        self.speed_value_widget = Label(self.master, text=str(self.speed_value))
+        self.speed_value_widget.config(font=("Arial", 24))
+        self.speed_value_widget.grid(row=0, column=3)
 
 
     # This method renders the images
