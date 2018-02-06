@@ -23,10 +23,13 @@ def stratify(name, bounds):
 		for col in colors:
 			l, u = getBounds(col)
 			if l is not None:
-				masks.append(cv2.inRange(hsv, l, u))
+				temp = cv2.inRange(hsv, l, u)
+				masks.append(temp)
 		for m in masks:
 			cv2.bitwise_or(combined, m, combined)
+
 		mask = combined
+		#cv2.fastNlMeansDenoising(src=mask, dst=mask, h=75)
 	else:	
 		# set bounds of what you want to keep
 		sensitivity = 10
@@ -34,9 +37,21 @@ def stratify(name, bounds):
 		# make mask
 		mask = cv2.inRange(hsv, lower, upper)
 
-	cv2.imshow("Image", mask)
-	cv2.waitKey(0)
-	shapeify.shapeify(mask)
+	get_color = np.zeros((mask.shape[0], mask.shape[1], 3), np.uint8)
+	for x in range(mask.shape[0]):
+		for y in range(mask.shape[1]):
+			if mask[x][y] >= 1:
+				get_color[x][y][0] = 255
+				get_color[x][y][1] = 255
+				get_color[x][y][2] = 255
+			else:
+				get_color[x][y][0] = 0
+				get_color[x][y][1] = 0
+				get_color[x][y][2] = 0
+
+	cv2.fastNlMeansDenoisingColored(src=get_color, dst=get_color, h=60)
+	shapeify.shapeify3D(get_color)
+
 
 # input: string of color name
 # output: lower and upper bounds for that color
