@@ -19,7 +19,8 @@ class GroundStationApp:
     def __init__(self, master, drone_latitude, drone_longitude):
         self.master = master
         self.map_coordinates = (drone_latitude, drone_longitude)
-        self.obstacles = []
+        self.stationary_obstacles = []
+        self.moving_obstacles = []
         self.boundaries = []
         self.altitude_value = 0
         self.speed_value = 0
@@ -35,8 +36,28 @@ class GroundStationApp:
         self.refresh_map()
         self.master.update()
 
-    def add_obstacle(self, long, lat):
-        self.obstacles.append(CircleMarker((long, lat), 'red', 12))
+    def add_stationary_obstacle(self, long, lat):
+        self.stationary_obstacles.append(CircleMarker((long, lat), 'red', 12))
+        self.refresh_map()
+        self.master.update()
+
+    def add_moving_obstacle(self, long, lat):
+        self.moving_obstacles.append(CircleMarker((long, lat), 'green', 12))
+        self.refresh_map()
+        self.master.update()
+
+    def clear_stationary_obstacles(self):
+        self.stationary_obstacles = []
+
+    def clear_moving_obstacles(self):
+        self.moving_obstacles = []
+
+    #Input is an array of long lat tuples
+    def set_moving_obstacles(self, moving_obstacles):
+        self.moving_obstacles = []
+        for obstacle in moving_obstacles:
+            print("here i am")
+            self.moving_obstacles.append(CircleMarker((obstacle), 'green', 12))
         self.refresh_map()
         self.master.update()
 
@@ -77,9 +98,11 @@ class GroundStationApp:
         self.static_map = StaticMap(700, 700)#, url_template='http://a.tile.osm.org/{z}/{x}/{y}.png')
         self.drone_marker = CircleMarker(self.map_coordinates, '#0036FF', 12)
         self.static_map.add_marker(self.drone_marker)
-        for obstacle in self.obstacles:
-            self.static_map.add_marker(obstacle)
-            print("added it")
+        for stationary_obstacle in self.stationary_obstacles:
+            self.static_map.add_marker(stationary_obstacle)
+
+        for moving_obstacle in self.moving_obstacles:
+            self.static_map.add_marker(moving_obstacle)
 
         self.image = self.static_map.render(zoom=17)
         self.image.save('map.png')
@@ -93,7 +116,10 @@ def main():
     root = Tk()
     app = GroundStationApp(root, -75.165222, 39.952583)
     app.add_boundary(-75.164000, 39.951000, -75.165300, 39.952600)
-    app.add_obstacle(-75.164220, 39.9526585)
+    app.add_stationary_obstacle(-75.164220, 39.9526585)
+    moving_obstacles =[]
+    moving_obstacles.append((-75.163220, 39.9546585))
+    app.set_moving_obstacles(moving_obstacles)
     app.run()
 
 
