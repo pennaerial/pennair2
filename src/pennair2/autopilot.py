@@ -8,9 +8,9 @@ from sensor_msgs.msg import NavSatFix, Imu
 from std_msgs.msg import Float64
 from mavros_msgs.msg import State, BatteryStatus
 from mavros_msgs.srv import CommandLong, CommandInt, CommandLongRequest, CommandIntRequest
-import launch
 from roslaunch.scriptapi import ROSLaunch
 from roslaunch.core import Node
+from rosnode import rosnode_ping
 
 class Autopilot:
     __metaclass__ = ABCMeta
@@ -147,6 +147,10 @@ class Autopilot:
     def _local_twist_setter(self, val):
         pass
 
+    @abstractmethod
+    def is_connected(self):
+        pass
+
 
 class Mavros(Autopilot):
     def __init__(self, mavros_prefix="/mavros"):
@@ -241,6 +245,9 @@ class Mavros(Autopilot):
         self.command_long_srv = rospy.ServiceProxy(mavros_prefix + "/cmd/Command", CommandLong)
         self.command_int_srv = rospy.ServiceProxy(mavros_prefix + "/cmd/CommandInt", CommandInt)
         # endregion
+
+    def is_connected(self):
+        return (self.state is not None) and self.state.connected
 
     @property
     def state(self):

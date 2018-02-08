@@ -28,10 +28,22 @@ class UAV:
         self._setpoint_mode = None  # None, "POSITION", "VELOCITY"
         self._setpoint_heading = autopilot.heading
 
-        loop_timer = rospy.Timer(rospy.Duration.from_sec(1.0/frequency), self.loop)
+
+
+        rospy.loginfo("Waiting for autopilot connection.")
+        self.wait_for(self.autopilot.is_connected)
+        rospy.loginfo("Waiting for arm.")
+        self.wait_for(lambda: self.is_armed)
+
+        self.set_velocity([0, 0, 0])
+        loop_timer = rospy.Timer(rospy.Duration.from_sec(1.0/frequency), self.__control_loop)
         loop_timer.run()
 
-    def loop(self, event):
+        rospy.loginfo("Waiting for offboard mode.")
+        self.wait_for(lambda: self.is_offboard)
+        rospy.loginfo("Armed and in offboard!")
+
+    def __control_loop(self, event):
         if not rospy.is_shutdown():
             if self.is_armed and self.is_offboard:
                 if self._setpoint_mode is not None:
@@ -49,6 +61,10 @@ class UAV:
     def is_offboard(self):
         if isinstance(self.autopilot, Mavros):
             return self.autopilot.state.mode == "OFFBOARD"
+
+    def wait_for(self, fun, rate=30, wait_val=True):
+        while not fun() == wait_val:
+            rospy.sleep(1.0/rate)
 
     def get_gps(self):
         return self.autopilot.global_global
