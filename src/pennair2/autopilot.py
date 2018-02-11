@@ -1,16 +1,14 @@
 import rospy
 from abc import ABCMeta, abstractmethod
 from copy import deepcopy
-
-# ROS message imports
 from geometry_msgs.msg import PoseStamped, TwistStamped, PoseWithCovarianceStamped, Vector3Stamped
-from sensor_msgs.msg import NavSatFix, Imu
+from sensor_msgs.msg import NavSatFix, Imu, BatteryState
 from std_msgs.msg import Float64
-from mavros_msgs.msg import State, BatteryStatus
+from mavros_msgs.msg import State
 from mavros_msgs.srv import CommandLong, CommandInt, CommandLongRequest, CommandIntRequest
 from roslaunch.scriptapi import ROSLaunch
 from roslaunch.core import Node
-from rosnode import rosnode_ping
+from nav_msgs.msg import Odometry
 
 class Autopilot:
     __metaclass__ = ABCMeta
@@ -18,7 +16,7 @@ class Autopilot:
     def __init__(self):
         # region Private Fields
         self._global_global = None  # type: NavSatFix
-        self._global_local = None  # type: PoseStamped
+        self._global_local = None  # type: Odometry
         self._relative_altitude = None  # type: float
         self._heading = None  # type: float
         self._global_vel_raw = None  # type: TwistStamped
@@ -48,7 +46,7 @@ class Autopilot:
         The global position in UTM coordinates.
         UTM coordinates are used to define position on Earth using a Euclidean coordinate system.
         :return: Global position in local frame
-        :rtype: PoseStamped
+        :rtype: Odometry
         """
         return deepcopy(self._global_local)
 
@@ -163,7 +161,7 @@ class Mavros(Autopilot):
 
         # region Private Fields
         self._state = None  # type: State
-        self._battery = None  # type: BatteryStatus
+        self._battery = None  # type: BatteryState
         self.mavros_prefix = mavros_prefix  # type: str
 
         # endregion
@@ -216,7 +214,7 @@ class Mavros(Autopilot):
 
         # region Subscribers
         rospy.Subscriber(mavros_prefix + "/global_position/global", NavSatFix, global_global_callback)
-        rospy.Subscriber(mavros_prefix + "/global_position/local", PoseWithCovarianceStamped, global_local_callback)
+        rospy.Subscriber(mavros_prefix + "/global_position/local", Odometry, global_local_callback)
         rospy.Subscriber(mavros_prefix + "/global_position/gp_vel", TwistStamped, global_vel_callback)
         rospy.Subscriber(mavros_prefix + "/global_position/rel_alt", Float64, global_rel_alt_callback)
         rospy.Subscriber(mavros_prefix + "/global_position/compass_hdg", Float64, global_heading_callback)
@@ -230,17 +228,18 @@ class Mavros(Autopilot):
         rospy.Subscriber(mavros_prefix + "/local_position/velocity", TwistStamped, local_twist_callback)
 
         rospy.Subscriber(mavros_prefix + "/state", State, state_callback)
-        rospy.Subscriber(mavros_prefix + "/battery", BatteryStatus, battery_callback)
+        rospy.Subscriber(mavros_prefix + "/battery", BatteryState, battery_callback)
         # endregion
 
         # region Publishers
-        self.acceleration_pub = rospy.Publisher(mavros_prefix + "/setpoint_accel/accel", Vector3Stamped, queue_size=1)
-        self.ang_velocity_pub = rospy.Publisher(mavros_prefix + "/setpoint_attitude/cmd_vel", TwistStamped,
-                                                queue_size=1)
+        # attitude setpoints
+        self.ang_velocity_pub = rospy.Publisher(mavros_prefix + "/setpoint_attitude/cmd_vel", TwistStamped, queue_size=1)
         self.attitude_pub = rospy.Publisher(mavros_prefix + "/setpoint_attitude/attitude", PoseStamped, queue_size=1)
         self.throttle_pub = rospy.Publisher(mavros_prefix + "/setpoint_attitude/att_throttle", Float64, queue_size=1)
+
         self.position_pub = rospy.Publisher(mavros_prefix + "/setpoint_position/local", PoseStamped, queue_size=1)
-        self.velocity_pub = rospy.Publisher(mavros_prefix + "/setpoitn_velocity/cmd_vel", TwistStamped, queue_size=1)
+        self.velocity_pub = rospy.Publisher(mavros_prefix + "/setpoint_velocity/cmd_vel", TwistStamped, queue_size=1)
+        self.acceleration_pub = rospy.Publisher(mavros_prefix + "/setpoint_accel/accel", Vector3Stamped, queue_size=1)
 
         self.command_long_srv = rospy.ServiceProxy(mavros_prefix + "/cmd/Command", CommandLong)
         self.command_int_srv = rospy.ServiceProxy(mavros_prefix + "/cmd/CommandInt", CommandInt)
@@ -263,7 +262,7 @@ class Mavros(Autopilot):
         """
         The status of the battery. This has to be properly configured in QGroundControl to be reliable.
         :return: Battery status
-        :rtype: BatteryStatus
+        :rtype: BatteryState
         """
         return deepcopy(self._battery)
 
@@ -290,10 +289,18 @@ class Mavros(Autopilot):
             return False, None
 
     def _local_pose_setter(self, val):
-        self.position_pub.publish(val)
+        # type: (PoseStamped) -> None
+        msg = PoseStamped()
+        msg.header.frame_id = val.header.frame_id
+        msg.pose = val.pose
+        self.position_pub.publish(msg)
 
     def _local_twist_setter(self, val):
-        self.velocity_pub.publish(val)
+        # type: (TwistStamped) -> None
+        msg = TwistStamped()
+        msg.header.frame_id = val.header.frame_id
+        msg.twist = val.twist
+        self.velocity_pub.publish(msg)
 
     def launch_node(self, roslaunch, fcu_url="udp://:14540@127.0.0.1:14557", gcs_url="udp://@10.42.0.1", remap_args=None):
         """
