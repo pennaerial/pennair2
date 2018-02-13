@@ -29,7 +29,6 @@ def stratify(name, bounds):
 			cv2.bitwise_or(combined, m, combined)
 
 		mask = combined
-		#cv2.fastNlMeansDenoising(src=mask, dst=mask, h=75)
 	else:	
 		# set bounds of what you want to keep
 		sensitivity = 10
@@ -49,7 +48,7 @@ def stratify(name, bounds):
 				get_color[x][y][1] = 0
 				get_color[x][y][2] = 0
 
-	cv2.fastNlMeansDenoisingColored(src=get_color, dst=get_color, h=60)
+	cv2.fastNlMeansDenoisingColored(src=get_color, dst=get_color, h=75)
 	shapeify.shapeify3D(get_color)
 
 
