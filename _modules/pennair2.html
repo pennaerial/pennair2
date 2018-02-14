@@ -1,0 +1,597 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>pennair2 package &#8212; pennair2  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pennair2-package">
+<h1>pennair2 package<a class="headerlink" href="#pennair2-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-pennair2.autopilot">
+<span id="pennair2-autopilot-module"></span><h2>pennair2.autopilot module<a class="headerlink" href="#module-pennair2.autopilot" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pennair2.autopilot.Autopilot">
+<em class="property">class </em><code class="descclassname">pennair2.autopilot.</code><code class="descname">Autopilot</code><a class="headerlink" href="#pennair2.autopilot.Autopilot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="attribute">
+<dt id="pennair2.autopilot.Autopilot.global_global">
+<code class="descname">global_global</code><a class="headerlink" href="#pennair2.autopilot.Autopilot.global_global" title="Permalink to this definition">¶</a></dt>
+<dd><p>The global position as a GPS coordinate.
+:return: GPS position.
+:rtype: NavSatFix</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pennair2.autopilot.Autopilot.global_local">
+<code class="descname">global_local</code><a class="headerlink" href="#pennair2.autopilot.Autopilot.global_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>The global position in UTM coordinates.
+UTM coordinates are used to define position on Earth using a Euclidean coordinate system.
+:return: Global position in local frame
+:rtype: Odometry</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pennair2.autopilot.Autopilot.global_velocity_raw">
+<code class="descname">global_velocity_raw</code><a class="headerlink" href="#pennair2.autopilot.Autopilot.global_velocity_raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>The raw GPS velocity.
+:return: GPS velocity
+:rtype: TwistStamped</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pennair2.autopilot.Autopilot.gps_raw">
+<code class="descname">gps_raw</code><a class="headerlink" href="#pennair2.autopilot.Autopilot.gps_raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raw GPS position data.
+:return: raw GPS data
+:rtype: NavSatFix</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pennair2.autopilot.Autopilot.gps_twist_raw">
+<code class="descname">gps_twist_raw</code><a class="headerlink" href="#pennair2.autopilot.Autopilot.gps_twist_raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raw GPS velocity data.
+:return: raw GPS velocity
+:rtype: TwistStamped</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pennair2.autopilot.Autopilot.heading">
+<code class="descname">heading</code><a class="headerlink" href="#pennair2.autopilot.Autopilot.heading" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The heading.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pennair2.autopilot.Autopilot.imu_data">
+<code class="descname">imu_data</code><a class="headerlink" href="#pennair2.autopilot.Autopilot.imu_data" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Imu data, orientation computed by FCU</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Imu</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pennair2.autopilot.Autopilot.imu_raw">
+<code class="descname">imu_raw</code><a class="headerlink" href="#pennair2.autopilot.Autopilot.imu_raw" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Raw IMU data without orientation</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Imu</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pennair2.autopilot.Autopilot.is_connected">
+<code class="descname">is_connected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.autopilot.Autopilot.is_connected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pennair2.autopilot.Autopilot.local_pose">
+<code class="descname">local_pose</code><a class="headerlink" href="#pennair2.autopilot.Autopilot.local_pose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fused position in local reference frame, as defined in ~local_position/frame_id
+:return: Local position
+:rtype: PoseStamped</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pennair2.autopilot.Autopilot.local_twist">
+<code class="descname">local_twist</code><a class="headerlink" href="#pennair2.autopilot.Autopilot.local_twist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fused linear and angular velocity from the FCU.
+:return: velocity
+:rtype: TwistStamped</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pennair2.autopilot.Autopilot.relative_altitude">
+<code class="descname">relative_altitude</code><a class="headerlink" href="#pennair2.autopilot.Autopilot.relative_altitude" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The relative altitude to home.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pennair2.autopilot.Mavros">
+<em class="property">class </em><code class="descclassname">pennair2.autopilot.</code><code class="descname">Mavros</code><span class="sig-paren">(</span><em>mavros_prefix='/mavros'</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.autopilot.Mavros" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pennair2.autopilot.Autopilot" title="pennair2.autopilot.Autopilot"><code class="xref py py-class docutils literal notranslate"><span class="pre">pennair2.autopilot.Autopilot</span></code></a></p>
+<dl class="attribute">
+<dt id="pennair2.autopilot.Mavros.battery">
+<code class="descname">battery</code><a class="headerlink" href="#pennair2.autopilot.Mavros.battery" title="Permalink to this definition">¶</a></dt>
+<dd><p>The status of the battery. This has to be properly configured in QGroundControl to be reliable.
+:return: Battery status
+:rtype: BatteryState</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pennair2.autopilot.Mavros.is_connected">
+<code class="descname">is_connected</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.autopilot.Mavros.is_connected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.autopilot.Mavros.launch_node">
+<code class="descname">launch_node</code><span class="sig-paren">(</span><em>roslaunch</em>, <em>fcu_url='udp://:14540&#64;127.0.0.1:14557'</em>, <em>gcs_url='udp://&#64;10.42.0.1'</em>, <em>remap_args=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.autopilot.Mavros.launch_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch a mavros node corresponding to the appropriate
+:param remap_args: Additional arguments to pass to the launch file
+:type remap_args: dict[str,str]
+:param fcu_url: The url of the flight control unit.
+:type fcu_url: str
+:param gcs_url: The url of the ground station (qGroundControl) for passthrough.
+:type gcs_url: str
+:param roslaunch: An instance of ROSLaunch that allows the running of nodes.
+:type roslaunch:  ROSLaunch</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pennair2.autopilot.Mavros.send_command_long">
+<code class="descname">send_command_long</code><span class="sig-paren">(</span><em>cmd</em>, <em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.autopilot.Mavros.send_command_long" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a raw MAVLINK command.
+:param cmd: The command number.
+:type cmd: int
+:param params: A list of parameters to send in the command.
+:type params: int list
+:return: A boolean that specifies success and an integer specifying the result.
+:rtype: (bool, int)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pennair2.autopilot.Mavros.state">
+<code class="descname">state</code><a class="headerlink" href="#pennair2.autopilot.Mavros.state" title="Permalink to this definition">¶</a></dt>
+<dd><p>The state of the autopilot. Includes things like current mode.
+:return: Mavros state
+:rtype: State</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pennair2.conversions">
+<span id="pennair2-conversions-module"></span><h2>pennair2.conversions module<a class="headerlink" href="#module-pennair2.conversions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="pennair2.conversions.feet_to_meters">
+<code class="descclassname">pennair2.conversions.</code><code class="descname">feet_to_meters</code><span class="sig-paren">(</span><em>feet</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.conversions.feet_to_meters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pennair2.conversions.knots_to_mets">
+<code class="descclassname">pennair2.conversions.</code><code class="descname">knots_to_mets</code><span class="sig-paren">(</span><em>knots</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.conversions.knots_to_mets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pennair2.conversions.meters_to_feet">
+<code class="descclassname">pennair2.conversions.</code><code class="descname">meters_to_feet</code><span class="sig-paren">(</span><em>meters</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.conversions.meters_to_feet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pennair2.conversions.meters_to_miles">
+<code class="descclassname">pennair2.conversions.</code><code class="descname">meters_to_miles</code><span class="sig-paren">(</span><em>meters</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.conversions.meters_to_miles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pennair2.conversions.mets_to_knots">
+<code class="descclassname">pennair2.conversions.</code><code class="descname">mets_to_knots</code><span class="sig-paren">(</span><em>mets</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.conversions.mets_to_knots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pennair2.conversions.miles_to_meters">
+<code class="descclassname">pennair2.conversions.</code><code class="descname">miles_to_meters</code><span class="sig-paren">(</span><em>miles</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.conversions.miles_to_meters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pennair2.conversions.position_to_numpy">
+<code class="descclassname">pennair2.conversions.</code><code class="descname">position_to_numpy</code><span class="sig-paren">(</span><em>position</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.conversions.position_to_numpy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a numpy array (as a column vector) representation of a geometry_msgs position.
+:param position:
+:type position: PoseStamped | Pose | Point | Vector3</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pennair2.core">
+<span id="pennair2-core-module"></span><h2>pennair2.core module<a class="headerlink" href="#module-pennair2.core" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pennair2.core.Multirotor">
+<em class="property">class </em><code class="descclassname">pennair2.core.</code><code class="descname">Multirotor</code><span class="sig-paren">(</span><em>autopilot</em>, <em>frequency=30</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.Multirotor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pennair2.core.UAV" title="pennair2.core.UAV"><code class="xref py py-class docutils literal notranslate"><span class="pre">pennair2.core.UAV</span></code></a></p>
+<dl class="method">
+<dt id="pennair2.core.Multirotor.hover">
+<code class="descname">hover</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.Multirotor.hover" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.core.Multirotor.land">
+<code class="descname">land</code><span class="sig-paren">(</span><em>speed=0.5</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.Multirotor.land" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.core.Multirotor.set_position">
+<code class="descname">set_position</code><span class="sig-paren">(</span><em>position</em>, <em>frame_id=None</em>, <em>heading=None</em>, <em>blocking=False</em>, <em>margin=0.5</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.Multirotor.set_position" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>value</strong> (<em>PoseStamped | Pose | Point | list</em><em>[</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>] </em><em>|</em><em> (</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>)</em>) – The desired position setpoint, only yaw component of orientation is used. Can be of type
+PoseStamped, Pose, Point, or an indexable object with 3 integer elements (list, tuple, numpy array etc.)</li>
+<li><strong>frame_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The name of the frame to use for the message.</li>
+<li><strong>heading</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – Your desired heading.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pennair2.core.Multirotor.takeoff">
+<code class="descname">takeoff</code><span class="sig-paren">(</span><em>speed=1</em>, <em>target_height=10</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.Multirotor.takeoff" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pennair2.core.UAV">
+<em class="property">class </em><code class="descclassname">pennair2.core.</code><code class="descname">UAV</code><span class="sig-paren">(</span><em>autopilot</em>, <em>frequency=30</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.UAV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="class">
+<dt id="pennair2.core.UAV.SetpointMode">
+<em class="property">class </em><code class="descname">SetpointMode</code><a class="headerlink" href="#pennair2.core.UAV.SetpointMode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<dl class="attribute">
+<dt id="pennair2.core.UAV.SetpointMode.ACCELERATION">
+<code class="descname">ACCELERATION</code><em class="property"> = 3</em><a class="headerlink" href="#pennair2.core.UAV.SetpointMode.ACCELERATION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pennair2.core.UAV.SetpointMode.POSITION">
+<code class="descname">POSITION</code><em class="property"> = 1</em><a class="headerlink" href="#pennair2.core.UAV.SetpointMode.POSITION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pennair2.core.UAV.SetpointMode.VELOCITY">
+<code class="descname">VELOCITY</code><em class="property"> = 2</em><a class="headerlink" href="#pennair2.core.UAV.SetpointMode.VELOCITY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="method">
+<dt id="pennair2.core.UAV.displacement_from_target">
+<code class="descname">displacement_from_target</code><span class="sig-paren">(</span><em>target=None</em>, <em>current=None</em>, <em>frame_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.UAV.displacement_from_target" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.core.UAV.distance_to_target">
+<code class="descname">distance_to_target</code><span class="sig-paren">(</span><em>target=None</em>, <em>current=None</em>, <em>frame_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.UAV.distance_to_target" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.core.UAV.get_gps">
+<code class="descname">get_gps</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.UAV.get_gps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.core.UAV.get_heading">
+<code class="descname">get_heading</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.UAV.get_heading" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.core.UAV.get_position">
+<code class="descname">get_position</code><span class="sig-paren">(</span><em>utm=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.UAV.get_position" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.core.UAV.get_relative_altitude">
+<code class="descname">get_relative_altitude</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.UAV.get_relative_altitude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.core.UAV.get_velocity">
+<code class="descname">get_velocity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.UAV.get_velocity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pennair2.core.UAV.is_armed">
+<code class="descname">is_armed</code><a class="headerlink" href="#pennair2.core.UAV.is_armed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pennair2.core.UAV.is_offboard">
+<code class="descname">is_offboard</code><a class="headerlink" href="#pennair2.core.UAV.is_offboard" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.core.UAV.set_position">
+<code class="descname">set_position</code><span class="sig-paren">(</span><em>value</em>, <em>frame_id=None</em>, <em>heading=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.UAV.set_position" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>value</strong> (<em>PoseStamped | Pose | Point | list</em><em>[</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>] </em><em>|</em><em> (</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>)</em>) – The desired position setpoint, only yaw component of orientation is used. Can be of type
+PoseStamped, Pose, Point, or an indexable object with 3 integer elements (list, tuple, numpy array etc.)</li>
+<li><strong>frame_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The name of the frame to use for the message.</li>
+<li><strong>heading</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – Your desired heading.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pennair2.core.UAV.set_velocity">
+<code class="descname">set_velocity</code><span class="sig-paren">(</span><em>value</em>, <em>frame_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.UAV.set_velocity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.core.UAV.shutdown">
+<code class="descname">shutdown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.UAV.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.core.UAV.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.UAV.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.core.UAV.wait_for">
+<code class="descname">wait_for</code><span class="sig-paren">(</span><em>fun</em>, <em>rate=30</em>, <em>wait_val=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.UAV.wait_for" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pennair2.launch">
+<span id="pennair2-launch-module"></span><h2>pennair2.launch module<a class="headerlink" href="#module-pennair2.launch" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pennair2.launch.LaunchFile">
+<em class="property">class </em><code class="descclassname">pennair2.launch.</code><code class="descname">LaunchFile</code><a class="headerlink" href="#pennair2.launch.LaunchFile" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="class">
+<dt id="pennair2.launch.LaunchFile.Node">
+<em class="property">class </em><code class="descname">Node</code><span class="sig-paren">(</span><em>name</em>, <em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.launch.LaunchFile.Node" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pennair2.launch.LaunchFile.Node.add_param">
+<code class="descname">add_param</code><span class="sig-paren">(</span><em>name</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.launch.LaunchFile.Node.add_param" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.launch.LaunchFile.Node.add_remap">
+<code class="descname">add_remap</code><span class="sig-paren">(</span><em>old</em>, <em>new</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.launch.LaunchFile.Node.add_remap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.launch.LaunchFile.Node.add_rosparam">
+<code class="descname">add_rosparam</code><span class="sig-paren">(</span><em>name</em>, <em>text</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.launch.LaunchFile.Node.add_rosparam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="method">
+<dt id="pennair2.launch.LaunchFile.add_node">
+<code class="descname">add_node</code><span class="sig-paren">(</span><em>name</em>, <em>node</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.launch.LaunchFile.add_node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.launch.LaunchFile.generate">
+<code class="descname">generate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.launch.LaunchFile.generate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.launch.LaunchFile.write">
+<code class="descname">write</code><span class="sig-paren">(</span><em>package</em>, <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.launch.LaunchFile.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pennair2.localization">
+<span id="pennair2-localization-module"></span><h2>pennair2.localization module<a class="headerlink" href="#module-pennair2.localization" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pennair2.localization.Generator">
+<em class="property">class </em><code class="descclassname">pennair2.localization.</code><code class="descname">Generator</code><a class="headerlink" href="#pennair2.localization.Generator" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pennair2.localization.Generator.add_localization">
+<code class="descname">add_localization</code><span class="sig-paren">(</span><em>name</em>, <em>mavros_prefix=None</em>, <em>is_ukf=True</em>, <em>frame_prefix=''</em>, <em>map_is_world=True</em>, <em>publish_tf=True</em>, <em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.localization.Generator.add_localization" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.localization.Generator.add_navstat_transform">
+<code class="descname">add_navstat_transform</code><span class="sig-paren">(</span><em>name</em>, <em>mavros_prefix=None</em>, <em>broadcast_transform=True</em>, <em>mavros=None</em>, <em>imu_remap=None</em>, <em>gps_remap=None</em>, <em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.localization.Generator.add_navstat_transform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.localization.Generator.write">
+<code class="descname">write</code><span class="sig-paren">(</span><em>package</em>, <em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.localization.Generator.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pennair2.utm">
+<span id="pennair2-utm-module"></span><h2>pennair2.utm module<a class="headerlink" href="#module-pennair2.utm" title="Permalink to this headline">¶</a></h2>
+<p>This code is not the work of Penn Aerial Robotics, but the utm package from Tobias Bieniek (MIT License)</p>
+<dl class="function">
+<dt id="pennair2.utm.to_latlon">
+<code class="descclassname">pennair2.utm.</code><code class="descname">to_latlon</code><span class="sig-paren">(</span><em>easting</em>, <em>northing</em>, <em>zone_number</em>, <em>zone_letter=None</em>, <em>northern=None</em>, <em>strict=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.utm.to_latlon" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function convert an UTM coordinate into Latitude and Longitude</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>easting: int</dt>
+<dd>Easting value of UTM coordinate</dd>
+<dt>northing: int</dt>
+<dd>Northing value of UTM coordinate</dd>
+<dt>zone number: int</dt>
+<dd>Zone Number is represented with global map numbers of an UTM Zone
+Numbers Map. More information see utmzones <a href="#id6"><span class="problematic" id="id7"><span id="id1"></span>[1]_</span></a></dd>
+<dt>zone_letter: str</dt>
+<dd>Zone Letter can be represented as string values. Where UTM Zone
+Designators can be accessed in <a href="#id8"><span class="problematic" id="id9"><span id="id2"></span>[1]_</span></a></dd>
+<dt>northern: bool</dt>
+<dd>You can set True or False to set this parameter. Default is None</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="pennair2.utm.from_latlon">
+<code class="descclassname">pennair2.utm.</code><code class="descname">from_latlon</code><span class="sig-paren">(</span><em>latitude</em>, <em>longitude</em>, <em>force_zone_number=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.utm.from_latlon" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function convert Latitude and Longitude to UTM coordinate</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>latitude: float</dt>
+<dd>Latitude between 80 deg S and 84 deg N, e.g. (-80.0 to 84.0)</dd>
+<dt>longitude: float</dt>
+<dd>Longitude between 180 deg W and 180 deg E, e.g. (-180.0 to 180.0).</dd>
+<dt>force_zone number: int</dt>
+<dd>Zone Number is represented with global map numbers of an UTM Zone
+Numbers Map. You may force conversion including one UTM Zone Number.
+More information see utmzones <a href="#id10"><span class="problematic" id="id11"><span id="id4"></span>[1]_</span></a></dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pennair2">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pennair2" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">pennair2 package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-pennair2.autopilot">pennair2.autopilot module</a></li>
+<li><a class="reference internal" href="#module-pennair2.conversions">pennair2.conversions module</a></li>
+<li><a class="reference internal" href="#module-pennair2.core">pennair2.core module</a></li>
+<li><a class="reference internal" href="#module-pennair2.launch">pennair2.launch module</a></li>
+<li><a class="reference internal" href="#module-pennair2.localization">pennair2.localization module</a></li>
+<li><a class="reference internal" href="#module-pennair2.utm">pennair2.utm module</a></li>
+<li><a class="reference internal" href="#module-pennair2">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_modules/pennair2.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Penn Aerial Robotics.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../_sources/_modules/pennair2.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
