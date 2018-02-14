@@ -1,3 +1,6 @@
+# Copyright (C) 2018  Penn Aerial Robotics
+# Fill copyright notice at github.com/pennaerial/pennair2/NOTICE
+
 from launch import LaunchFile
 from roslaunch.scriptapi import ROSLaunch
 from roslaunch import Node
