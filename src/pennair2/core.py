@@ -1,16 +1,24 @@
-from .autopilot import Autopilot, Mavros
-from abc import ABCMeta, abstractmethod
 import numpy as np
-from geometry_msgs.msg import PoseStamped, Pose, Point, TwistStamped, Twist, Vector3
-from tf_conversions import transformations
-
 import rospy
 import tf2_ros
 import tf2_geometry_msgs
 import math
-import threading
+from autopilot import Autopilot, Mavros
+from abc import ABCMeta, abstractmethod
+from geometry_msgs.msg import PoseStamped, Pose, Point, TwistStamped, Twist, Vector3
+from tf_conversions import transformations
+from enum import Enum
+from conversions import position_to_numpy
 
-class UAV:
+
+
+
+class UAV(object):
+    class SetpointMode(Enum):
+        POSITION = 1
+        VELOCITY = 2
+        ACCELERATION = 3
+
     def __init__(self, autopilot, frequency=30):
         """
 
@@ -19,26 +27,29 @@ class UAV:
         """
         __metaclass__ = ABCMeta
 
+        self.frequency = frequency
         self.autopilot = autopilot
         self.tf_buffer = tf2_ros.Buffer(rospy.Duration(120))  # tf buffer length in seconds
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)  # type: tf2_ros.TransformListener
 
-        self._setpoint_pos = autopilot.local_pose
-        self._setpoint_vel = None
-        self._setpoint_mode = None  # None, "POSITION", "VELOCITY"
-        self._setpoint_heading = autopilot.heading
+        rospy.loginfo("Waiting for autopilot connection.")
+        self.wait_for(self.autopilot.is_connected)
+        rospy.loginfo("Connected.")
 
-        loop_timer = rospy.Timer(rospy.Duration.from_sec(1.0/frequency), self.loop)
-        loop_timer.run()
+        self._setpoint_pos = None  # type: PoseStamped
+        self._setpoint_vel = None  # type: TwistStamped
+        self._setpoint_mode = None  # type: UAV.SetpointMode
+        self._setpoint_heading = None  # type: int
 
-    def loop(self, event):
+        # setpoint/control stream loop, must publish setpoints to change into OFFBOARD
+        self.loop_timer = rospy.Timer(rospy.Duration.from_sec(1.0 / frequency), self.__control_loop)
+
+    def __control_loop(self, event):
         if not rospy.is_shutdown():
-            if self.is_armed and self.is_offboard:
-                if self._setpoint_mode is not None:
-                    if self._setpoint_mode == "POSITION":
-                        self.autopilot.local_pose = self._setpoint_pos
-                    elif self._setpoint_mode == "VELOCITY":
-                        self.autopilot.local_twist = self._setpoint_vel
+            if self._setpoint_mode is UAV.SetpointMode.POSITION:
+                self.autopilot.local_pose = self._setpoint_pos
+            elif self._setpoint_mode is UAV.SetpointMode.VELOCITY:
+                self.autopilot.local_twist = self._setpoint_vel
 
     @property
     def is_armed(self):
@@ -49,6 +60,10 @@ class UAV:
     def is_offboard(self):
         if isinstance(self.autopilot, Mavros):
             return self.autopilot.state.mode == "OFFBOARD"
+
+    def wait_for(self, fun, rate=30, wait_val=True):
+        while not fun() == wait_val:
+            rospy.sleep(1.0/rate)
 
     def get_gps(self):
         return self.autopilot.global_global
@@ -66,17 +81,28 @@ class UAV:
             return self.autopilot.local_pose
 
     def set_position(self, value, frame_id=None, heading=None):
+        """
+
+        :param value: The desired position setpoint, only yaw component of orientation is used. Can be of type
+            PoseStamped, Pose, Point, or an indexable object with 3 integer elements (list, tuple, numpy array etc.)
+        :type value: PoseStamped | Pose | Point | list[int,int,int] | (int,int,int)
+        :param frame_id: The name of the frame to use for the message.
+        :type frame_id: str
+        :param heading: Your desired heading.
+        :type heading: int
+        """
         if isinstance(value, PoseStamped):
-            value.header.frame_id = frame_id
-            self._setpoint_pos = value
+            msg = value
+            if frame_id is not None:
+                msg.header.frame_id = frame_id
         else:
             msg = PoseStamped()
             msg.header.frame_id = frame_id
 
-            if type(value) is Pose:  # if Pose then position and orientation already provided
+            if isinstance(value, Pose):  # if Pose then position and orientation already provided
                 msg.pose = value
             else:
-                if type(value) is Point:
+                if isinstance(value, Point):
                     msg.pose.position = value
                 else:
                     msg.pose.position.x = value[0]
@@ -85,57 +111,84 @@ class UAV:
 
                 if heading is None:
                     heading = self._setpoint_heading
+                if heading is None:
+                    heading = self.get_heading()
                 q = transformations.quaternion_from_euler(0, 0, heading)
                 msg.pose.orientation.x = q[0]
                 msg.pose.orientation.y = q[1]
                 msg.pose.orientation.z = q[2]
                 msg.pose.orientation.w = q[3]
-
-            self._setpoint_pos = msg
-        self._setpoint_mode = "POSITION"
+        msg.header.stamp = rospy.Time.now()
+        self._setpoint_pos = msg
+        self._setpoint_mode = UAV.SetpointMode.POSITION
 
     def get_velocity(self):
         return self.autopilot.local_twist
 
     def set_velocity(self, value, frame_id=None):
-        if type(value) is TwistStamped:
-            value.header.frame_id = frame_id
-            self._setpoint_vel = value
+        if isinstance(value, TwistStamped):
+            msg = value
+            if frame_id is not None:
+                msg.header.frame_id = frame_id
         else:
             msg = TwistStamped()
             msg.header.frame_id = frame_id
 
-            if type(value) is Twist:
+            if isinstance(value, Twist):
                 msg.twist = value
             else:
-                if type(value) is Vector3:
+                if isinstance(value, Vector3):
                     msg.twist.linear = value
                 else:
-                    msg.twist.linear.x = value[0]
-                    msg.twist.linear.y = value[1]
-                    msg.twist.linear.z = value[2]
+                    if isinstance(value, np.ndarray):
+                        value = value.reshape((3, 1))
+                        msg.twist.linear.x = value[0, 0]
+                        msg.twist.linear.y = value[1, 0]
+                        msg.twist.linear.z = value[2, 0]
+                    elif isinstance(value, (list, tuple)):
+                        msg.twist.linear.x = value[0]
+                        msg.twist.linear.y = value[1]
+                        msg.twist.linear.z = value[2]
                 msg.twist.angular.x = 0
                 msg.twist.angular.y = 0
                 msg.twist.angular.z = 0
-            self._setpoint_vel = value
-        self._setpoint_mode = "VELOCITY"
+        msg.header.stamp = rospy.Time.now()
+        self._setpoint_vel = msg
+        self._setpoint_mode = UAV.SetpointMode.VELOCITY
 
-    def pose_distance(self, frame_id, target=None, current=None):
-        transform1 = self.tf_buffer.lookup_transform(frame_id,
-                                                     target.header.frame_id,
-                                                     rospy.Time(0),
-                                                     rospy.Duration(1)
-                                                     )
+    def distance_to_target(self, target=None, current=None, frame_id=None):
+        d = position_to_numpy(self.displacement_from_target(target, current, frame_id))
+        return np.linalg.norm(d)
 
-        transform2 = self.tf_buffer.lookup_transform(frame_id,
-                                                     current.header.frame_id,
-                                                     rospy.Time(0),
-                                                     rospy.Duration(1)
-                                                     )
+    def displacement_from_target(self, target=None, current=None, frame_id=None):
+        if target is None:
+            target = self._setpoint_pos
+        if current is None:
+            current = self.get_position()
 
-        target = tf2_geometry_msgs.do_transform_pose(target, transform1).pose.position
-        current = tf2_geometry_msgs.do_transform_pose(current, transform2).pose.position
-        return math.sqrt((target.x - current.x)**2 + (target.y - current.y)**2 + (target.z - current.z)**2)
+        if frame_id is not None:
+            transform1 = self.tf_buffer.lookup_transform(frame_id,
+                                                         target.header.frame_id,
+                                                         rospy.Time(0),
+                                                         rospy.Duration(1)
+                                                         )
+
+            transform2 = self.tf_buffer.lookup_transform(frame_id,
+                                                         current.header.frame_id,
+                                                         rospy.Time(0),
+                                                         rospy.Duration(1)
+                                                         )
+            target = tf2_geometry_msgs.do_transform_pose(target, transform1)
+            current = tf2_geometry_msgs.do_transform_pose(current, transform2)
+        target = target.pose.position
+        current = current.pose.position
+        return Vector3(target.x - current.x, target.y - current.y, target.z - current.z)
+
+    def shutdown(self):
+        self.loop_timer.shutdown()
+
+    def start(self):
+        self.loop_timer.start()
 
 
 class Multirotor(UAV):
@@ -150,16 +203,29 @@ class Multirotor(UAV):
     def hover(self):
         self.set_position(self.get_position())
 
-    def takeoff(self, speed=0.5, target_height=10):
+    def takeoff(self, speed=1, target_height=10):
+        rospy.loginfo("Waiting for arm.")
+        self.wait_for(lambda: self.is_armed)
         self.set_velocity([0, 0, abs(speed)])
-        rate = rospy.Rate(100)
+        rospy.loginfo("Waiting for offboard.")
+        self.wait_for(lambda: self.is_offboard)
+
+        rate = rospy.Rate(self.frequency)
         while self.autopilot.relative_altitude < target_height:
             rate.sleep()
         self.hover()
 
     def land(self, speed=0.5):
         self.hover()
+        rospy.sleep(5)
         self.set_velocity([0, 0, -abs(speed)])
-        rate = rospy.Rate(100)
-        while self.autopilot.relative_altitude > 0:
+        rate = rospy.Rate(self.frequency)
+        while self.is_armed:
+            rate.sleep()
+
+    def set_position(self, position, frame_id=None, heading=None, blocking=False, margin=0.5):
+        UAV.set_position(self, position, frame_id, heading)
+        self.set_position(position)
+        rate = rospy.Rate(self.frequency)
+        while self.distance_to_target() > margin:
             rate.sleep()
