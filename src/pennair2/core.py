@@ -84,7 +84,7 @@ class UAV(object):
         """
 
         :param value: The desired position setpoint, only yaw component of orientation is used. Can be of type
-        PoseStamped, Pose, Point, or an indexable object with 3 integer elements (list, tuple, numpy array etc.)
+            PoseStamped, Pose, Point, or an indexable object with 3 integer elements (list, tuple, numpy array etc.)
         :type value: PoseStamped | Pose | Point | list[int,int,int] | (int,int,int)
         :param frame_id: The name of the frame to use for the message.
         :type frame_id: str
