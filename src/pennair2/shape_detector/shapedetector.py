@@ -21,6 +21,8 @@ class ShapeDetector:
 		side_l = self.get_distance_simple(box[0], box[1])
 		side_w = self.get_distance_simple(box[1], box[2])
 		min_box_area = side_l*side_w
+		temp = self.similar_sides(cv2.convexHull(c))
+		hull_peri = sum(temp[1])
 
 		# if the shape is a triangle, it will have 3 vertices
 		if len(approx) == 3:
@@ -71,18 +73,21 @@ class ShapeDetector:
 				shape = "hexagon"
 			else:
 				shape = self.check_circular(side_w, side_l, area, c)
+				check = self.check_cross(c, peri, area, hull_peri)
+				if check:
+					shape = "cross"
 				
 		elif len(approx) == 7:
 			shape = "heptagon"
 
-			check = self.check_cross(side_w, side_l, area)
+			check = self.check_cross(c, peri, area, hull_peri)
 			if check:
 				shape = "cross"
 
 		elif len(approx) == 8:
 			shape = "octagon"
 
-			check = self.check_cross(side_w, side_l, area)
+			check = self.check_cross(c, peri, area, hull_peri)
 			if check:
 				shape = "cross"
 
@@ -132,15 +137,13 @@ class ShapeDetector:
 		side_lengths.append(self.get_distance_approx(approx[0], approx[len(approx) - 1]))
 		avg = sum(side_lengths)/len(side_lengths)
 		for side in side_lengths:
-			if not (side >= avg*0.6 and side <= avg*1.4):
+			if not (side >= avg*0.7 and side <= avg*1.3):
 				is_similar = False
 		return [is_similar, side_lengths]
 
 	# draw circle using longest side of fit box
-	def check_cross(self, side_w, side_l, area):
-		side = max(side_w, side_l)
-		near_circle = pow(side/2, 2) * math.pi
-		if abs(area < near_circle*0.6):
+	def check_cross(self, c, peri, area, hull_peri):
+		if hull_peri < peri and abs(hull_peri - peri) > peri * 0.1:
 			return True
 		else:
 			return False

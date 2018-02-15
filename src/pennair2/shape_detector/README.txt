@@ -6,10 +6,11 @@ Parameter:
 - Input any one of the colors to detect all shapes of that color (note: green and brown not implemented) or input "all" to detect all shapes of all colors.
 
 Ignores:
-- Only checked if parameter="all", it's all the colors you don't want to look for to handle the fact that the background isn't always green
+- Only checked if parameter="all", list all the colors you don't want to look for to handle the fact that the background isn't always green
 
 Known issues:
 - Cannot detect shapes with same color as background
+- Black and grey have wrong hsv because it's not reacting right
 
 Other:
 - Some test pictures are provided

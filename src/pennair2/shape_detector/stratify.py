@@ -52,7 +52,7 @@ def stratify(name, bounds, ignore=None):
 				get_color[x][y][1] = 0
 				get_color[x][y][2] = 0
 
-	#cv2.fastNlMeansDenoisingColored(src=get_color, dst=get_color, h=75)
+	cv2.fastNlMeansDenoisingColored(src=get_color, dst=get_color, h=75)
 	shapeify.shapeify3D(get_color, frame)
 
 # input: string of color name
@@ -65,10 +65,12 @@ def getBounds(bounds):
 		upper = np.array([0, 0, 255])
 	
 	elif bounds == "black":
-		lower = np.array([0, 0, 0])
+		lower = np.array([10, 0, 0])
 		upper = np.array([50, 50, 100])
 		
-	elif bounds == "gray":
+	elif bounds == "grey":
+		lower = np.array([103, 86, 65])
+		upper = np.array([145, 133, 128])
 		pass
 
 	elif bounds == "red":
@@ -80,6 +82,8 @@ def getBounds(bounds):
 		upper = np.array([140,255,255])
 
 	elif bounds == "green":
+		lower = np.array([50, 100, 100])
+		upper = np.array([70, 255, 255])
 		pass
 
 	elif bounds == "yellow":

@@ -43,14 +43,14 @@ def shapeify3D(image, color_image):
                 c = c.astype("float")
                 c *= ratio
                 c = c.astype("int")
-                cv2.drawContours(color_image, [c], -1, (0, 255, 0), 2)
-                cv2.putText(color_image, shape, (cX, cY), cv2.FONT_HERSHEY_SIMPLEX,
+                cv2.drawContours(image, [c], -1, (0, 255, 0), 2)
+                cv2.putText(image, shape, (cX, cY), cv2.FONT_HERSHEY_SIMPLEX,
                     0.5, (0, 0, 255), 2)
 
                 #orient(c, image)
 
                 # show the output image
-                cv2.imshow("Image", color_image)
+                cv2.imshow("Image", image)
                 cv2.waitKey(0)
         except ZeroDivisionError:
             pass
