@@ -4,8 +4,7 @@ import math
 import numpy as np
 import imutils
 
-# todo: implement ratios between peri and other vars
-# for more complex shapes
+# given contour, return shape
 class ShapeDetector:
 	def __init__(self):
 		pass
@@ -46,13 +45,17 @@ class ShapeDetector:
 
 			# is rectangle or square
 			if min_box_area < area * 1.1 and min_box_area > area * 0.9:
-				shape = "rect or sq"
+				if (side_w/side_l) < 1.2 and (side_w/side_l) > 0.8:
+					shape = "square"
+				else:
+					shape = "rectangle"
+
 			# else is trapezoid or part of circle
 			elif ((np.isclose([angles[0]], [angles[1]], 0.2) and np.isclose([angles[2]], [angles[3]], 0.2))
 				or (np.isclose([angles[1]], [angles[2]], 0.2) and np.isclose([angles[3]], [angles[0]], 0.2))):
 				shape = "trapezoid"
 			else:
-				shape = self.check_circular(side_w, side_l, area)
+				shape = self.check_circular(side_w, side_l, area, c)
 
 		# if the shape is a pentagon, it will have 5 vertices
 		elif len(approx) == 5:
@@ -60,14 +63,14 @@ class ShapeDetector:
 			if is_pent[0]:
 				shape = "pentagon"
 			else:
-				shape = self.check_circular(side_w, side_l, area)
+				shape = self.check_circular(side_w, side_l, area, c)
 
 		elif len(approx) == 6:
 			is_hex = self.similar_sides(approx)
 			if is_hex[0]:
 				shape = "hexagon"
 			else:
-				shape = self.check_circular(side_w, side_l, area)
+				shape = self.check_circular(side_w, side_l, area, c)
 				
 		elif len(approx) == 7:
 			shape = "heptagon"
@@ -84,7 +87,11 @@ class ShapeDetector:
 				shape = "cross"
 
 		elif len(approx) == 10 or len(approx) == 9:
-			shape = "star"
+			is_star = self.similar_sides(approx)
+			if is_star[0]:
+				shape = "star"
+			else:
+				shape = "cross"
 
 		elif len(approx) == 12 or len(approx) == 11 or len(approx) == 13 or len(approx) == 14:
 			shape = "cross"
@@ -95,9 +102,9 @@ class ShapeDetector:
 
 		#check circle because circle has issues
 		if side_w < side_l*1.03 and side_w > side_l*0.97 and len(approx) >= 6:
-			radius = side_w/2
-			expected_area = pow(radius,2)*math.pi
-			if area < expected_area*1.03 and area > expected_area*0.97:
+			el = cv2.fitEllipse(c)
+			el_area = math.pi * (el[1][0]/2) * (el[1][1]/2)
+			if abs(area - el_area) < area * 0.01:
 				shape="circle"
 
 		# return the name of the shape
@@ -125,32 +132,26 @@ class ShapeDetector:
 		side_lengths.append(self.get_distance_approx(approx[0], approx[len(approx) - 1]))
 		avg = sum(side_lengths)/len(side_lengths)
 		for side in side_lengths:
-			if not (side >= avg*0.7 and side <= avg*1.3):
+			if not (side >= avg*0.6 and side <= avg*1.4):
 				is_similar = False
 		return [is_similar, side_lengths]
 
+	# draw circle using longest side of fit box
 	def check_cross(self, side_w, side_l, area):
 		side = max(side_w, side_l)
 		near_circle = pow(side/2, 2) * math.pi
-		if abs(area - (side_w * side_l)/2) < abs(area - near_circle):
+		if abs(area < near_circle*0.6):
 			return True
 		else:
 			return False
 
-	# 1 for semicircle, 2 for quarter circle
-	def check_circular(self, side_w, side_l, area):
+	# checks if is some type of circle-related thing
+	def check_circular(self, side_w, side_l, area, c):
 		side = max(side_w, side_l)
-		expected_qt = pow(side, 2) * math.pi/4
+		expected_qt_full = pow(side, 2) * math.pi/4
 		expected_half = pow(side/2, 2) * math.pi/2
-		expected_full = pow(side/2, 2) * math.pi
-		diff_qt = abs(area - expected_qt)
-		diff_half = abs(area - expected_half)
-		diff_full = abs(area - expected_full)
-		min_diff = min(diff_qt, min(diff_half, diff_full))
 
-		if min_diff == diff_qt:
-			return "quarter circle"
-		elif min_diff == diff_half:
+		if abs(area - expected_qt_full) > abs(area - expected_half):
 			return "half circle"
-		else: 
-			return "circle"
+		else:
+			return "quarter circle"
