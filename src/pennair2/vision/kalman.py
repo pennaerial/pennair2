@@ -90,7 +90,7 @@ class Kalman:
 	def calcF(self):
 		if self.recalcF:
 			if self.typeF == 0:
-				self.filter.F = np.array([[1, self.dt, 0.5*dt**2], [0, 1, self.dt],[0, 0, 1]])
+				self.filter.F = np.array([[1, self.dt, 0.5*self.dt**2], [0, 1, self.dt],[0, 0, 1]])
 			elif self.typeF == 1:
 				self.filter.F = np.array([[1, self.dt], [0, 1]])
 			elif self.typeF == 2:
@@ -112,12 +112,12 @@ class Kalman:
 		self.calcDt()
 		self.calcF()
 		self.calcQ()
-		if (x is not None):
+		if x is not None:
 			x = np.array([x])
 			x = x.reshape((x.size,1))
-		if (self.initialstate is None) and (x is not None):
-			self.initialstate = x
-			self.filter.x = np.matmul(np.transpose(self.filter.H),self.initialstate)
+			if self.initialstate is None:
+				self.initialstate = x
+				self.filter.x = np.matmul(np.transpose(self.filter.H),self.initialstate)
 		self.filter.predict()
 		if x is not None:
 			self.filter.update(x)
