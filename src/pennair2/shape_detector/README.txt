@@ -1,5 +1,6 @@
 Running the program:
-Mac: python classify.py <image file> <parameter> <ignores>
+Mac: python classify.py <image file> <parameter> <ignores if parameter=all>
+Example: python classify.py grass2.jpg all
 Not Mac: ???
 
 Parameter:
@@ -10,7 +11,6 @@ Ignores:
 
 Known issues:
 - Cannot detect shapes with same color as background
-- Black and grey have wrong hsv because it's not reacting right
 
 Other:
 - Some test pictures are provided
@@ -18,7 +18,6 @@ Other:
 
 To do:
 - Figure out how to detect shapes with same color as background
-- Implement more colors
 - Figure out how HSV works so can make changes at the competition if needed
-- Allow setting background color to avoid whitewashing the whole output regardless of surface you're flying over
-- Label shapes with their colors
+- Accommodate different backgrounds than grass
+- Fix green color problem

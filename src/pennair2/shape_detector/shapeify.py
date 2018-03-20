@@ -1,10 +1,12 @@
 # import the necessary packages
 from shapedetector import ShapeDetector
+import process_alpha as alpha
 import argparse
 import imutils
 import cv2
 import sys
 import numpy as np
+import math
 
 # given picture, call other function to label picture
 def shapeify3D(image, color_image):
@@ -44,39 +46,58 @@ def shapeify3D(image, color_image):
                 c *= ratio
                 c = c.astype("int")
                 cv2.drawContours(image, [c], -1, (0, 255, 0), 2)
+                cv2.drawContours(image, [c], -1, (0, 255, 0), 2)
                 cv2.putText(image, shape, (cX, cY), cv2.FONT_HERSHEY_SIMPLEX,
                     0.5, (0, 0, 255), 2)
 
-                #orient(c, image)
-
-                # show the output image
-                cv2.imshow("Image", image)
-                cv2.waitKey(0)
+                cropped = crop_image(c, color_image)
+                if cropped is not None:
+                    # show the output image
+                    # cv2.imshow("Image", image)
+                    cv2.imshow("Crop", cropped)
+                    cv2.waitKey(0)
         except ZeroDivisionError:
             pass
 
-#testing add-ons that might work for orientation
-def orient(c, image): 
-    try:
-        rect = cv2.minAreaRect(c)
-        box = cv2.boxPoints(rect)
-        box = np.int0(box)
-        # line of box
-        line_r, line_c =image.shape[:2]
-        [vx, vy, x, y] = cv2.fitLine(box, cv2.DIST_L2,0,0.01,0.01)
-        if vx < 0.01: vx = 0.0000001
-        lefty = int((-x*vy/vx) + y)
-        righty = int(((image.shape[1]-x)*vy/vx)+y)
-        cv2.line(image,(image.shape[1]-1,righty),(0,lefty),(255,255,0),2)
-        # line of item
-        line_r, line_c =image.shape[:2]
-        [vx, vy, x, y] = cv2.fitLine(c, cv2.DIST_L2,0,0.01,0.01)
-        if vx < 0.01: vx = 0.0000001
-        lefty = int((-x*vy/vx) + y)
-        righty = int(((image.shape[1]-x)*vy/vx)+y)
-        cv2.line(image,(image.shape[1]-1,righty),(0,lefty),(255,0,0),2)
-    except Exception:
-        pass
+#cut out smallest square that fits around a contour
+def crop_image(c, image): 
+    x,y,w,h = cv2.boundingRect(c)
+    longest = max(w, h)
+    cropped = None
+    paddingAbove = None
+    paddingLeft = None
+    # need to vertically center shape
+    if longest == w:
+        center = math.floor(y+h/2)
+        left = center-math.floor(w/2)
+        right = left + w
+        if left < 0:
+            left = 0
+        if right >= image.shape[0]:
+            right = image.shape[0]
+        paddingAbove = left
+        paddingLeft = x
+        cropped = image[left:right, x:x+w, 0::]
+    # need to horizontally center shape
+    else:
+        center = math.floor(x+w/2)
+        left = center-math.floor(h/2)
+        right = left + h
+        if left < 0:
+            left = 0
+        if right >= image.shape[1]:
+            right = image.shape[1]
+        paddingAbove = y
+        paddingLeft = left
+        cropped = image[y:y+h, left:right, 0::]
+
+    cX, cY = alpha.get_center(c)
+    alpha.stratify_color(cropped, c, cX - paddingLeft, cY - paddingAbove)
+    return cropped
+
+def extract_letter(c, image):
+
+    pass
 
 if __name__=="__main__":
     shapeify3D(sys.argv[1])

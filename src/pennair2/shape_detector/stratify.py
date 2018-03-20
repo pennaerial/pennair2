@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import shapeify
 from shapedetector import ShapeDetector
-
+from hsv import ColorsHSV
 
 def stratify(name, bounds, ignore=None):
 	# Read image
@@ -55,52 +55,41 @@ def stratify(name, bounds, ignore=None):
 	cv2.fastNlMeansDenoisingColored(src=get_color, dst=get_color, h=75)
 	shapeify.shapeify3D(get_color, frame)
 
+
 # input: string of color name
 # output: lower and upper bounds for that color
 def getBounds(bounds):
 	lower = None
 	upper = None
 	if bounds == "white":
-		lower = np.array([0, 0, 0])
-		upper = np.array([0, 0, 255])
+		lower, upper = ColorsHSV.white
 	
 	elif bounds == "black":
-		lower = np.array([10, 0, 0])
-		upper = np.array([50, 50, 100])
+		lower, upper = ColorsHSV.black
 		
 	elif bounds == "grey":
-		lower = np.array([103, 86, 65])
-		upper = np.array([145, 133, 128])
-		pass
+		lower, upper = ColorsHSV.grey
 
 	elif bounds == "red":
-		lower = np.array([0, 100, 100])
-		upper = np.array([10, 255, 255])
+		lower, upper = ColorsHSV.red
 
 	elif bounds == "blue":
-		lower = np.array([100,150,0])
-		upper = np.array([140,255,255])
+		lower, upper = ColorsHSV.blue
 
 	elif bounds == "green":
-		lower = np.array([50, 100, 100])
-		upper = np.array([70, 255, 255])
-		pass
+		lower, upper = ColorsHSV.green
 
 	elif bounds == "yellow":
-		lower = np.array([20,100,100])
-		upper = np.array([30,255,255])
+		lower, upper = ColorsHSV.yellow
 
 	elif bounds == "purple":
-		lower = np.array([120, 80, 80])
-		upper = np.array([140, 255, 255])
+		lower, upper = ColorsHSV.purple
 
 	elif bounds == "brown":
-		lower = np.array([2, 100, 65])
-		upper = np.array([12, 170, 100])
+		lower, upper = ColorsHSV.brown
 
 	elif bounds == "orange":
-		lower = np.array([10, 100, 20])
-		upper = np.array([25, 255, 255])
+		lower, upper = ColorsHSV.orange
 
 	else:
 		print("Invalid color")
