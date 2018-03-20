@@ -94,12 +94,8 @@ class UAV(object):
         """
         if isinstance(value, PoseStamped):
             msg = value
-            if frame_id is not None:
-                msg.header.frame_id = frame_id
         else:
             msg = PoseStamped()
-            msg.header.frame_id = frame_id
-
             if isinstance(value, Pose):  # if Pose then position and orientation already provided
                 msg.pose = value
             else:
@@ -110,15 +106,19 @@ class UAV(object):
                     msg.pose.position.y = value[1]
                     msg.pose.position.z = value[2]
 
-                if heading is None:
+                if self._setpoint_heading is not None:
                     heading = self._setpoint_heading
-                if heading is None:
+                else:
                     heading = self.get_heading()
                 q = transformations.quaternion_from_euler(0, 0, heading)
                 msg.pose.orientation.x = q[0]
                 msg.pose.orientation.y = q[1]
                 msg.pose.orientation.z = q[2]
                 msg.pose.orientation.w = q[3]
+        if frame_id is not None:
+            if not isinstance(frame_id, str):
+                pass
+            msg.header.frame_id = frame_id
         msg.header.stamp = rospy.Time.now()
         self._setpoint_pos = msg
         self._setpoint_mode = UAV.SetpointMode.POSITION
@@ -129,8 +129,6 @@ class UAV(object):
     def set_velocity(self, value, frame_id=None):
         if isinstance(value, TwistStamped):
             msg = value
-            if frame_id is not None:
-                msg.header.frame_id = frame_id
         else:
             msg = TwistStamped()
             msg.header.frame_id = frame_id
@@ -153,6 +151,8 @@ class UAV(object):
                 msg.twist.angular.x = 0
                 msg.twist.angular.y = 0
                 msg.twist.angular.z = 0
+        if frame_id is not None:
+            msg.header.frame_id = frame_id
         msg.header.stamp = rospy.Time.now()
         self._setpoint_vel = msg
         self._setpoint_mode = UAV.SetpointMode.VELOCITY
@@ -225,6 +225,19 @@ class Multirotor(UAV):
             rate.sleep()
 
     def set_position(self, position, frame_id=None, heading=None, blocking=False, margin=0.5):
+        """
+        Tells multirotor to fly to maintain given position.
+        :param position: The setpoint position.
+        :type position: PoseStamped | Pose | Point | list[int,int,int] | (int,int,int)
+        :param frame_id: The frame relative to which the setpoint is set.
+        :type frame_id: str
+        :param heading: The heading to maintain.
+        :type heading: int
+        :param blocking: Weather or not to block the thread until setpoint reached.
+        :type blocking: bool
+        :param margin: The setpoint margin. Only matters if blocking is true.
+        :type margin: float
+        """
         UAV.set_position(self, position, frame_id, heading)
         rate = rospy.Rate(self.frequency)
         while self.distance_to_target() > margin:
