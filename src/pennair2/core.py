@@ -11,8 +11,6 @@ from enum import Enum
 from conversions import position_to_numpy
 
 
-
-
 class UAV(object):
     class SetpointMode(Enum):
         POSITION = 1
