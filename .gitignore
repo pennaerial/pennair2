@@ -1,4 +1,9 @@
+# IDE
 .idea/
 *.pyc
 docs/_build/
 docs/_modules/
+
+# Vim
+.*swp
+.*swo
