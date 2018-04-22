@@ -1,6 +1,7 @@
 # Copyright (C) 2018  Penn Aerial Robotics
 # Fill copyright notice at github.com/pennaerial/pennair2/NOTICE
 
+import core
 from core import UAV
 import copy
 
@@ -43,3 +44,11 @@ class Swarm():
             offset += self.margin
 
         return pl
+
+    def hover(self):
+        for x in self.members:
+            if isinstance(x, core.Multirotor):
+                x.hover()
+            else:
+                print("WARN: Called hover on non-multirotor")
+
