@@ -62,6 +62,9 @@ class UAV(object):
         if isinstance(self.autopilot, Mavros):
             return self.autopilot.state.mode == "OFFBOARD"
 
+    def wait(self, seconds, rate=30):
+        rospy.sleep(seconds/rate)
+
     def wait_for(self, fun, rate=30, wait_val=True):
         while not fun() == wait_val:
             rospy.sleep(1.0/rate)

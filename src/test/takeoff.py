@@ -1,3 +1,5 @@
+#!/usr/bin/env python2
+
 from pennair2 import core, autopilot
 import rospy
 
