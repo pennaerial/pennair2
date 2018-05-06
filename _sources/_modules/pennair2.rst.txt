@@ -52,6 +52,22 @@ pennair2.localization module
     :undoc-members:
     :show-inheritance:
 
+pennair2.search module
+----------------------
+
+.. automodule:: pennair2.search
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pennair2.swarm module
+---------------------
+
+.. automodule:: pennair2.swarm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 pennair2.utm module
 -------------------
 
