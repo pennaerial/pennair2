@@ -413,17 +413,22 @@ UTM coordinates are used to define position on Earth using a Euclidean coordinat
 <dl class="method">
 <dt id="pennair2.core.Multirotor.set_position">
 <code class="descname">set_position</code><span class="sig-paren">(</span><em>position</em>, <em>frame_id=None</em>, <em>heading=None</em>, <em>blocking=False</em>, <em>margin=0.5</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.Multirotor.set_position" title="Permalink to this definition">¶</a></dt>
-<dd><p>Tells multirotor to fly to maintain given position.
-:param position: The setpoint position.
-:type position: PoseStamped | Pose | Point | list[int,int,int] | (int,int,int)
-:param frame_id: The frame relative to which the setpoint is set.
-:type frame_id: str
-:param heading: The heading to maintain.
-:type heading: int
-:param blocking: Weather or not to block the thread until setpoint reached.
-:type blocking: bool
-:param margin: The setpoint margin. Only matters if blocking is true.
-:type margin: float</p>
+<dd><p>Tells multirotor to fly to maintain given position.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>position</strong> (<em>PoseStamped | Pose | Point | list</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>] </em><em>|</em><em> (</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – The setpoint position.</li>
+<li><strong>frame_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The frame relative to which the setpoint is set.</li>
+<li><strong>heading</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – The heading to maintain.</li>
+<li><strong>blocking</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Weather or not to block the thread until setpoint reached.</li>
+<li><strong>margin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The setpoint margin. Only matters if blocking is true.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
