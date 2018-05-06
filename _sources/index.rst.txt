@@ -19,4 +19,4 @@ Table of contents
 .. toctree::
    :glob:
 
-   _modules/*
+   _modules/*[^modules.rst]
