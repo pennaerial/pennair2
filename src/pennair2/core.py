@@ -62,6 +62,9 @@ class UAV(object):
         if isinstance(self.autopilot, Mavros):
             return self.autopilot.state.mode == "OFFBOARD"
 
+    def wait(self, seconds, rate=30):
+        rospy.sleep(seconds/rate)
+
     def wait_for(self, fun, rate=30, wait_val=True):
         while not fun() == wait_val:
             rospy.sleep(1.0/rate)
@@ -81,7 +84,8 @@ class UAV(object):
         else:
             return self.autopilot.local_pose
 
-    def set_position(self, value, frame_id=None, heading=None):
+    @staticmethod
+    def generate_pose_stamped(value, frame_id=None, heading=None):
         """
 
         :param value: The desired position setpoint, only yaw component of orientation is used. Can be of type
@@ -105,21 +109,42 @@ class UAV(object):
                     msg.pose.position.x = value[0]
                     msg.pose.position.y = value[1]
                     msg.pose.position.z = value[2]
-
-                if self._setpoint_heading is not None:
-                    heading = self._setpoint_heading
+                
+                if heading is not None:
+                    q = transformations.quaternion_from_euler(0, 0, heading)
+                    msg.pose.orientation.x = q[0]
+                    msg.pose.orientation.y = q[1]
+                    msg.pose.orientation.z = q[2]
+                    msg.pose.orientation.w = q[3]
                 else:
-                    heading = self.get_heading()
-                q = transformations.quaternion_from_euler(0, 0, heading)
-                msg.pose.orientation.x = q[0]
-                msg.pose.orientation.y = q[1]
-                msg.pose.orientation.z = q[2]
-                msg.pose.orientation.w = q[3]
+                    msg.pose.orientation.x = 0
+                    msg.pose.orientation.y = 0
+                    msg.pose.orientation.z = 0
+                    msg.pose.orientation.w = 0
+
         if frame_id is not None:
-            if not isinstance(frame_id, str):
-                pass
-            msg.header.frame_id = frame_id
+            if isinstance(frame_id, str):
+                msg.header.frame_id = frame_id
         msg.header.stamp = rospy.Time.now()
+        return msg
+
+    def set_position(self, value, frame_id=None, heading=None):
+        """
+
+        :param value: The desired position setpoint, only yaw component of orientation is used. Can be of type
+            PoseStamped, Pose, Point, or an indexable object with 3 integer elements (list, tuple, numpy array etc.)
+        :type value: PoseStamped | Pose | Point | list[int,int,int] | (int,int,int)
+        :param frame_id: The name of the frame to use for the message.
+        :type frame_id: str
+        :param heading: Your desired heading.
+        :type heading: int
+        """
+        if heading is None:
+            if self._setpoint_heading is not None:
+                heading = self._setpoint_heading
+            else:
+                heading = self.get_heading()
+        msg = self.generate_pose_stamped(value, frame_id, heading)
         self._setpoint_pos = msg
         self._setpoint_mode = UAV.SetpointMode.POSITION
 
