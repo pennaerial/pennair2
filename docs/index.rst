@@ -6,17 +6,17 @@
 Welcome to pennair2's documentation!
 ====================================
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-    :glob:
-    _modules/*
-
-
-
-Indices and tables
-==================
+This page is constantly being updated. If you see any problems or out of date documentations please share this with
+the development team.
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+Table of contents
+------------------------------------
+
+.. toctree::
+   :glob:
+
+   _modules/*

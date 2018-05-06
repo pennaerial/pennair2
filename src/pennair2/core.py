@@ -225,8 +225,8 @@ class Multirotor(UAV):
             rate.sleep()
 
     def set_position(self, position, frame_id=None, heading=None, blocking=False, margin=0.5):
-        """
-        Tells multirotor to fly to maintain given position.
+        """Tells multirotor to fly to maintain given position.
+
         :param position: The setpoint position.
         :type position: PoseStamped | Pose | Point | list[int,int,int] | (int,int,int)
         :param frame_id: The frame relative to which the setpoint is set.
