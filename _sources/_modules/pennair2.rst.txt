@@ -4,6 +4,14 @@ pennair2 package
 Submodules
 ----------
 
+pennair2.actuation module
+-------------------------
+
+.. automodule:: pennair2.actuation
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 pennair2.autopilot module
 -------------------------
 

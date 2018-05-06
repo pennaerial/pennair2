@@ -88,6 +88,7 @@
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">pennair2 package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-pennair2.actuation">pennair2.actuation module</a></li>
 <li><a class="reference internal" href="#module-pennair2.autopilot">pennair2.autopilot module</a></li>
 <li><a class="reference internal" href="#module-pennair2.conversions">pennair2.conversions module</a></li>
 <li><a class="reference internal" href="#module-pennair2.core">pennair2.core module</a></li>
@@ -165,12 +166,15 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="module-pennair2.actuation">
+<span id="pennair2-actuation-module"></span><h2>pennair2.actuation module<a class="headerlink" href="#module-pennair2.actuation" title="Permalink to this headline">¶</a></h2>
+</div>
 <div class="section" id="module-pennair2.autopilot">
 <span id="pennair2-autopilot-module"></span><h2>pennair2.autopilot module<a class="headerlink" href="#module-pennair2.autopilot" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="pennair2.autopilot.Autopilot">
 <em class="property">class </em><code class="descclassname">pennair2.autopilot.</code><code class="descname">Autopilot</code><a class="headerlink" href="#pennair2.autopilot.Autopilot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="attribute">
 <dt id="pennair2.autopilot.Autopilot.global_global">
 <code class="descname">global_global</code><a class="headerlink" href="#pennair2.autopilot.Autopilot.global_global" title="Permalink to this definition">¶</a></dt>
@@ -221,7 +225,7 @@ UTM coordinates are used to define position on Earth using a Euclidean coordinat
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The heading.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)">float</a></td>
 </tr>
 </tbody>
 </table>
@@ -287,7 +291,7 @@ UTM coordinates are used to define position on Earth using a Euclidean coordinat
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The relative altitude to home.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)">float</a></td>
 </tr>
 </tbody>
 </table>
@@ -409,20 +413,17 @@ UTM coordinates are used to define position on Earth using a Euclidean coordinat
 <dl class="method">
 <dt id="pennair2.core.Multirotor.set_position">
 <code class="descname">set_position</code><span class="sig-paren">(</span><em>position</em>, <em>frame_id=None</em>, <em>heading=None</em>, <em>blocking=False</em>, <em>margin=0.5</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.Multirotor.set_position" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>value</strong> (<em>PoseStamped | Pose | Point | list</em><em>[</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>] </em><em>|</em><em> (</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>)</em>) – The desired position setpoint, only yaw component of orientation is used. Can be of type
-PoseStamped, Pose, Point, or an indexable object with 3 integer elements (list, tuple, numpy array etc.)</li>
-<li><strong>frame_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The name of the frame to use for the message.</li>
-<li><strong>heading</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – Your desired heading.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
+<dd><p>Tells multirotor to fly to maintain given position.
+:param position: The setpoint position.
+:type position: PoseStamped | Pose | Point | list[int,int,int] | (int,int,int)
+:param frame_id: The frame relative to which the setpoint is set.
+:type frame_id: str
+:param heading: The heading to maintain.
+:type heading: int
+:param blocking: Weather or not to block the thread until setpoint reached.
+:type blocking: bool
+:param margin: The setpoint margin. Only matters if blocking is true.
+:type margin: float</p>
 </dd></dl>
 
 <dl class="method">
@@ -435,11 +436,11 @@ PoseStamped, Pose, Point, or an indexable object with 3 integer elements (list, 
 <dl class="class">
 <dt id="pennair2.core.UAV">
 <em class="property">class </em><code class="descclassname">pennair2.core.</code><code class="descname">UAV</code><span class="sig-paren">(</span><em>autopilot</em>, <em>frequency=30</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.core.UAV" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="class">
 <dt id="pennair2.core.UAV.SetpointMode">
 <em class="property">class </em><code class="descname">SetpointMode</code><a class="headerlink" href="#pennair2.core.UAV.SetpointMode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
 <dl class="attribute">
 <dt id="pennair2.core.UAV.SetpointMode.ACCELERATION">
 <code class="descname">ACCELERATION</code><em class="property"> = 3</em><a class="headerlink" href="#pennair2.core.UAV.SetpointMode.ACCELERATION" title="Permalink to this definition">¶</a></dt>
@@ -510,10 +511,10 @@ PoseStamped, Pose, Point, or an indexable object with 3 integer elements (list, 
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>value</strong> (<em>PoseStamped | Pose | Point | list</em><em>[</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>] </em><em>|</em><em> (</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>)</em>) – The desired position setpoint, only yaw component of orientation is used. Can be of type
+<li><strong>value</strong> (<em>PoseStamped | Pose | Point | list</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>] </em><em>|</em><em> (</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em>) – The desired position setpoint, only yaw component of orientation is used. Can be of type
 PoseStamped, Pose, Point, or an indexable object with 3 integer elements (list, tuple, numpy array etc.)</li>
-<li><strong>frame_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The name of the frame to use for the message.</li>
-<li><strong>heading</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – Your desired heading.</li>
+<li><strong>frame_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the frame to use for the message.</li>
+<li><strong>heading</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Your desired heading.</li>
 </ul>
 </td>
 </tr>
