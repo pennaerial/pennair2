@@ -6,7 +6,13 @@ from xml.dom import minidom
 import rospkg
 import os
 import roslaunch
+import rospy
 
+active_launches = []
+
+def _shutdown_handler():
+    for launch in active_launches:
+        launch.shutdown()
 
 def launch(package, name, **kwargs):
     """Call roslaunch.
@@ -15,17 +21,17 @@ def launch(package, name, **kwargs):
     :param name: The name of the launch file
     :param kwargs:
     """
+    rospack = rospkg.RosPack()
+    path = rospack.get_path(package) + "/launch"
+    path += "/" + name
+
     uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
     roslaunch.configure_logging(uuid)
+    launch = roslaunch.parent.ROSLaunchParent(uuid, [path])
 
-    cli_args = [package, name]
-    for key, value in kwargs.iteritems():
-        cli_args.append(key + ":=" + value)  # 'arg1:=arg1', 'arg2:=arg2' ...
-
-    roslaunch_file = roslaunch.rlutil.resolve_launch_arguments(cli_args)
-    roslaunch_args = cli_args[2:]
-    parent = roslaunch.parent.ROSLaunchParent(uuid, [(roslaunch_file, roslaunch_args)])
-    parent.start()
+    active_launches.append(launch)
+    rospy.on_shutdown(_shutdown_handler)
+    launch.start()
 
 class LaunchFile:
     def __init__(self):

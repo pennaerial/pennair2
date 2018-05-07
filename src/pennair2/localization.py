@@ -52,7 +52,7 @@ class Generator:
                  False, False, False,
                  True, True, True,
                  True, True, True]
-            localization.add_rosparam("imu0", str(imu_matrix))
+            localization.add_rosparam("imu0_config", str(imu_matrix).lower())
 
             localization.add_param("odom0", mavros_prefix + "/global_position/local")
             odom_matrix = \
@@ -61,7 +61,7 @@ class Generator:
                  False, False, False,
                  False, False, False,
                  False, False, False]
-            localization.add_rosparam("odom0_config", str(odom_matrix))
+            localization.add_rosparam("odom0_config", str(odom_matrix).lower())
 
             localization.add_param("gps0", mavros_prefix + "/global_position/global")
             gps_matrix = \
@@ -70,12 +70,14 @@ class Generator:
                  False, False, False,
                  True, True, True,
                  True, True, True]
-            localization.add_rosparam("gps0_config", str(gps_matrix))
+            localization.add_rosparam("gps0_config", str(gps_matrix).lower())
 
     def add_navstat_transform(self, name, mavros_prefix=None, broadcast_transform=True, **params):
-        transform = LaunchFile.Node("node",
-                                    {"name": name, "pkg": "robot_localization", "type": "navsat_transform_node"})
+        transform = LaunchFile.Node(name,params)
         self.launch.add_node(name, transform)
+        transform.element.set("pkg", "robot_localization")
+        transform.element.set("name", name)
+        transform.element.set("type", "navsat_transform_node")
 
         transform.add_param("broadcast_utm_transform", str(broadcast_transform).lower())
         for key, value in params.iteritems():

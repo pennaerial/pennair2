@@ -316,4 +316,6 @@ class Mavros(Autopilot):
         :param kwargs: Any other remap arguments.
 
         """
-        launch("pennair2", "mavros.launch", name=self.mavros_prefix, fcu_url=fcu_url, gcs_url=gcs_url, **kwargs)
+        pass
+        #TODO: make work after update to ROS Lunar
+        #launch("pennair2", "mavros.launch", name=self.mavros_prefix, fcu_url=fcu_url, gcs_url=gcs_url, **kwargs)
