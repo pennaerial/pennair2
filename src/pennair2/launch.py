@@ -5,6 +5,27 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 from xml.dom import minidom
 import rospkg
 import os
+import roslaunch
+
+
+def launch(package, name, **kwargs):
+    """Call roslaunch.
+
+    :param package: The package name.
+    :param name: The name of the launch file
+    :param kwargs:
+    """
+    uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+    roslaunch.configure_logging(uuid)
+
+    cli_args = [package, name]
+    for key, value in kwargs.iteritems():
+        cli_args.append(key + ":=" + value)  # 'arg1:=arg1', 'arg2:=arg2' ...
+
+    roslaunch_file = roslaunch.rlutil.resolve_launch_arguments(cli_args)
+    roslaunch_args = cli_args[2:]
+    parent = roslaunch.parent.ROSLaunchParent(uuid, [(roslaunch_file, roslaunch_args)])
+    parent.start()
 
 class LaunchFile:
     def __init__(self):
@@ -41,6 +62,6 @@ class LaunchFile:
         path = rospack.get_path(package) + "/launch"
         if not os.path.exists(path):
             os.makedirs(path)
-        path += "/" + name + ".launch"
+        path += "/" + name
         with open(path, "w") as f:
             f.write(self.generate())
