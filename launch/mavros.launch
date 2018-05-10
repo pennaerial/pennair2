@@ -6,8 +6,8 @@
 	<arg name="gcs_url" default="udp://@10.42.0.1"/>
 	<arg name="tgt_system" default="1"/>
 	<arg name="tgt_component" default="1"/>
-	<arg name="pluginlists_yaml" default="$(find osprey)/launch/px4_pluginlists.yaml"/>
-	<arg name="config_yaml" default="$(find osprey)/launch/px4_config.yaml"/>
+	<arg name="pluginlists_yaml" default="$(find pennair2)/launch/px4_pluginlists.yaml"/>
+	<arg name="config_yaml" default="$(find pennair2)/launch/px4_config.yaml"/>
 	<arg name="log_output" default="screen" />
 	<arg name="name" default="mavros" />
 

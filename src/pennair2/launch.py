@@ -10,16 +10,18 @@ import rospy
 
 active_launches = []
 
+
 def _shutdown_handler():
     for launch in active_launches:
         launch.shutdown()
 
-def launch(package, name, **kwargs):
-    """Call roslaunch.
+
+def launch(package, name):
+    """API call to roslaunch. Same as command line.
 
     :param package: The package name.
     :param name: The name of the launch file
-    :param kwargs:
+    :param kwargs: Not implemented in Kinetic. TODO: Implement in Lunar
     """
     rospack = rospkg.RosPack()
     path = rospack.get_path(package) + "/launch"
@@ -33,31 +35,38 @@ def launch(package, name, **kwargs):
     rospy.on_shutdown(_shutdown_handler)
     launch.start()
 
+
+class Node:
+    def __init__(self, name, params):
+        # type: (str, dict) -> None
+        self.name = name  # type: str
+        self.element = Element("node")  # type: xml.Element
+        for name, value in params.iteritems():
+            self.add_param(name, value)
+
+    def add_param(self, name, value):
+        SubElement(self.element, "param", {"name": name, "value": value})
+
+    def add_remap(self, old, new):
+        SubElement(self.element, "remap", {"from": old, "to": new})
+
+    def add_rosparam(self, name, text):
+        rosparam = SubElement(self.element, "rosparam", {"param": name})
+        rosparam.text = text
+
+    def add_attribute(self, name, value):
+        self.element.set(name, value)
+
+
 class LaunchFile:
     def __init__(self):
         self.element = Element("launch")
         self.nodes = {}
 
-    def add_node(self, name, node):
-        # type: (str, xml.Element) -> None
+    def add_node(self, node):
+        # type: (xml.Element) -> None
         self.element.append(node.element)
-        self.nodes[name] = node
-
-    class Node:
-        def __init__(self, name, params):
-            self.name = name  # type: str
-            self.params = params  # type: dict
-            self.element = Element("node")  # type: xml.Element
-
-        def add_param(self, name, value):
-            SubElement(self.element, "param", {"name": name, "value": value})
-
-        def add_remap(self, old, new):
-            SubElement(self.element, "remap", {"from": old, "to": new})
-
-        def add_rosparam(self, name, text):
-            rosparam = SubElement(self.element, "rosparam", {"param": name})
-            rosparam.text = text
+        self.nodes[node.name] = node
 
     def generate(self):
         reparsed = minidom.parseString(tostring(self.element))
