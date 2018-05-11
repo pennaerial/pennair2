@@ -47,15 +47,15 @@ def gps_to_utm(gps, force_utm_zone=None):
         (easting, northing, zone_number, zone_letter) = utm.from_latlon(gps.latitude, gps.longitude, force_utm_zone)
         pose_stamped.header = gps.header
         pose_stamped.header.frame_id = "utm"
-        pose_stamped.pose.x = easting
-        pose_stamped.pose.y = northing
-        pose_stamped.pose.z = gps.altitude
+        pose_stamped.pose.position.x = easting
+        pose_stamped.pose.position.y = northing
+        pose_stamped.pose.position.z = gps.altitude
     else:
         (easting, northing, zone_number, zone_letter) = utm.from_latlon(gps[2], gps[1], force_utm_zone)
         pose_stamped.header.frame_id = "utm"
-        pose_stamped.pose.x = easting
-        pose_stamped.pose.y = northing
-        pose_stamped.pose.z = gps[3]
+        pose_stamped.pose.position.x = easting
+        pose_stamped.pose.position.y = northing
+        pose_stamped.pose.position.z = gps[3]
     return pose_stamped
 
 def position_to_numpy(position):
