@@ -206,6 +206,7 @@ class UAV(object):
                                                          )
             target = tf2_geometry_msgs.do_transform_pose(target, transform1)
             current = tf2_geometry_msgs.do_transform_pose(current, transform2)
+        # Should probably allow Pose or PoseStamped objects
         target = target.pose.position
         current = current.pose.position
         return Vector3(target.x - current.x, target.y - current.y, target.z - current.z)
