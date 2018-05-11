@@ -1,104 +1,87 @@
 # Copyright (C) 2018  Penn Aerial Robotics
 # Fill copyright notice at github.com/pennaerial/pennair2/NOTICE
 
-from launch import LaunchFile
-from roslaunch.scriptapi import ROSLaunch
-from roslaunch import Node
 import rospy
+from launch import launch, Node
+from launch import LaunchFile
 
-class Generator:
-    def __init__(self):
-        self.launch = LaunchFile()
-        self.node = None
 
-    def add_localization(self, name, mavros_prefix=None, is_ukf=True, frame_prefix="", map_is_world=True, publish_tf=True, **params):
-        localization = LaunchFile.Node(name, params)  # type: LaunchFile.Node
-        self.launch.add_node(name, localization)
+class LocalizationNode(Node):
+    def __init__(self, name, ukf=False, map_is_world=True, frame_prefix="", publish_tf=True, **params):
+        # type: (str, bool, bool, str, bool) -> None
+        Node.__init__(self, name, params)
 
-        type = None  # type: str
-        if is_ukf:
+        if ukf:
             type = "ukf_localization_node"
         else:
             type = "ekf_localization_node"
 
-        localization.element.set("pkg", "robot_localization")
-        localization.element.set("name", name)
-        localization.element.set("type", type)
+        self.add_attribute("pkg", "robot_localization")
+        self.add_attribute("name", name)
+        self.add_attribute("type", type)
+
+        self.add_remap("/odometry/filtered", "/{0}/odometry/filtered".format(name))
 
         if map_is_world:
-            localization.add_param("world_frame", frame_prefix + "map")
-
+            self.add_param("world_frame", frame_prefix + "map")
         else:
-            localization.add_param("world_frame", frame_prefix + "odom")
+            self.add_param("world_frame", frame_prefix + "odom")
 
-        localization.add_param("map_frame", frame_prefix + "map")
-        localization.add_param("odom_frame", frame_prefix + "odom")
-        localization.add_param("baselink_frame", frame_prefix + "fcu_local")
+        self.add_param("map_frame", frame_prefix + "map")
+        self.add_param("odom_frame", frame_prefix + "odom")
+        self.add_param("base_link_frame", frame_prefix + "fcu")
 
         if publish_tf:
-            localization.add_param("publish_tf", "true")
+            self.add_param("publish_tf", "true")
         else:
-            localization.add_param("publish_tf", "false")
+            self.add_param("publish_tf", "false")
 
-        for key, value in params.iteritems():
-            localization.add_param(key, value)
+    def add_source(self, name, topic, matrix):
+        # type: (str, str, list[bool]) -> None
+        self.add_rosparam(name, topic)
+        self.add_rosparam(name + "_config", str(matrix).lower())
 
-        if mavros_prefix is not None:
-            localization.add_param("imu0", mavros_prefix + "/imu/data")
-            imu_matrix = \
-                [False, False, False,
-                 True, True, True,
-                 False, False, False,
-                 True, True, True,
-                 True, True, True]
-            localization.add_rosparam("imu0", str(imu_matrix))
+    def add_mavros(self, mavros_prefix="", gps=True):
+        # type: (str, bool) -> None
+        imu_matrix = \
+            [False, False, False,
+             True, True, True,
+             False, False, False,
+             True, True, True,
+             True, True, True]
+        self.add_source("imu0", mavros_prefix+"/imu/data", imu_matrix)
 
-            localization.add_param("odom0", mavros_prefix + "/global_position/local")
-            odom_matrix = \
-                [True, True, True,
-                 False, False, False,
-                 False, False, False,
-                 False, False, False,
-                 False, False, False]
-            localization.add_rosparam("odom0_config", str(odom_matrix))
+        odom_matrix = \
+            [True, True, True,
+             False, False, False,
+             False, False, False,
+             False, False, False,
+             False, False, False]
+        self.add_source("odom0", mavros_prefix + "/global_position/local", odom_matrix)
 
-            localization.add_param("gps0", mavros_prefix + "/global_position/global")
+        if gps:
             gps_matrix = \
                 [False, False, False,
                  True, True, True,
                  False, False, False,
                  True, True, True,
                  True, True, True]
-            localization.add_rosparam("gps0_config", str(gps_matrix))
+            self.add_source("gps0", mavros_prefix + "/global_position/data", gps_matrix)
 
-    def add_navstat_transform(self, name, mavros_prefix=None, broadcast_transform=True, mavros=None, imu_remap=None, gps_remap=None, **params):
-        transform = LaunchFile.Node("node", {"name":name, "pkg": "robot_localization", "type": "navsat_transform_node"})
-        self.launch.add_node(name, transform)
 
-        transform.add_param("broadcast_utm_transform", str(broadcast_transform).lower())
-        for key, value in params.iteritems():
-            transform.add_param(key, value)
-
+class NavstatTransformNode(Node):
+    def __init__(self, name, localization_node_odometry, mavros_prefix=None, broadcast_transform=True, **params):
+        # type: (str, LocalizationNode, str, bool) -> None
+        Node.__init__(self, name, params)
+        self.add_attribute("pkg", "robot_localization")
+        self.add_attribute("name", name)
+        self.add_attribute("type", "navsat_transform_node")
+        self.add_param("broadcast_utm_transform", str(broadcast_transform).lower())
+        self.add_remap("/odometry/filtered", '/{0}/odometry/filtered'.format(localization_node_odometry.name))
         if mavros_prefix is not None:
-            transform.add_remap("/imu/data", mavros_prefix + "/imu/data")
-            transform.add_remap("/gps/fix", mavros_prefix + "/gps/fix")
+            self.specify_data(mavros_prefix + "/imu/data", mavros_prefix + "/global_position/raw/fix")
 
-    def write(self, package, name):
-        self.launch.write(package, name)
-
-
-
-
-if __name__ == "__main__":
-    rospy.init_node("node")
-    generator = Generator()
-    generator.add_localization("localization", mavros_prefix="/mavros")
-    generator.add_navstat_transform("navstat_transform")
-    generator.write("pennair2", "test")
-    roslaunch = ROSLaunch()
-    roslaunch.start()
-    node = Node("pennair2", "test.launch")
-    roslaunch.launch(node)
-
-
-
+    def specify_data(self, imu_topic, gps_topic):
+        # type: (str, str) -> None
+        self.add_remap("/imu/data", imu_topic)
+        self.add_remap("/gps/fix", gps_topic)

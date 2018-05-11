@@ -1,8 +1,12 @@
 # Copyright (C) 2018  Penn Aerial Robotics
 # Fill copyright notice at github.com/pennaerial/pennair2/NOTICE
 
-from geometry_msgs.msg import PoseStamped, Pose, Point, Vector3
 import numpy as np
+import utm
+from geometry_msgs.msg import Pose, Point, Vector3
+from geometry_msgs.msg import PoseStamped
+from sensor_msgs.msg import NavSatFix
+
 
 def feet_to_meters(feet):
     # One meter is 0.3048
@@ -27,6 +31,32 @@ def knots_to_mets(knots):
 
 def mets_to_knots(mets):
     return 1.94384449244 * mets
+
+def gps_to_utm(gps, force_utm_zone=None):
+    """
+    Convert GPS to UTM position.
+
+    :rtype: (PoseStamped, zone)
+    :param gps: A gps position. If list/tuple given then (longitude, latitude, altitude). Altitude in WSG84.
+    :type gps: NavSatFix | list[float,float,float] | (float,float,float)
+    :param force_utm_zone: If not None, then will force utm zone as specified.
+    :type force_utm_zone: int
+    """
+    pose_stamped = PoseStamped()
+    if isinstance(gps, NavSatFix):
+        (easting, northing, zone_number, zone_letter) = utm.from_latlon(gps.latitude, gps.longitude, force_utm_zone)
+        pose_stamped.header = gps.header
+        pose_stamped.header.frame_id = "utm"
+        pose_stamped.pose.x = easting
+        pose_stamped.pose.y = northing
+        pose_stamped.pose.z = gps.altitude
+    else:
+        (easting, northing, zone_number, zone_letter) = utm.from_latlon(gps[2], gps[1], force_utm_zone)
+        pose_stamped.header.frame_id = "utm"
+        pose_stamped.pose.x = easting
+        pose_stamped.pose.y = northing
+        pose_stamped.pose.z = gps[3]
+    return pose_stamped
 
 def position_to_numpy(position):
     """

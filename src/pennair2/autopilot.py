@@ -12,6 +12,7 @@ from mavros_msgs.srv import CommandLong, CommandInt, CommandLongRequest, Command
 from roslaunch.scriptapi import ROSLaunch
 from roslaunch.core import Node
 from nav_msgs.msg import Odometry
+from pennair2.launch import launch
 
 class Autopilot:
     __metaclass__ = ABCMeta
@@ -305,23 +306,16 @@ class Mavros(Autopilot):
         msg.twist = val.twist
         self.velocity_pub.publish(msg)
 
-    def launch_node(self, roslaunch, fcu_url="udp://:14540@127.0.0.1:14557", gcs_url="udp://@10.42.0.1", remap_args=None):
+    def launch_node(self, fcu_url="udp://:14540@127.0.0.1:14557", gcs_url="udp://@10.42.0.1", **kwargs):
         """
         Launch a mavros node corresponding to the appropriate
-        :param remap_args: Additional arguments to pass to the launch file
-        :type remap_args: dict[str,str]
         :param fcu_url: The url of the flight control unit.
         :type fcu_url: str
         :param gcs_url: The url of the ground station (qGroundControl) for passthrough.
         :type gcs_url: str
-        :param roslaunch: An instance of ROSLaunch that allows the running of nodes.
-        :type roslaunch:  ROSLaunch
-        """
-        node = Node("pennair2", "mavros.launch")
-        if remap_args is not None:
-            node.remap_args += remap_args.items()
+        :param kwargs: Any other remap arguments.
 
-        node.remap_args += [("name", self.mavros_prefix),
-                            ("fcu_url", fcu_url),
-                            ("gcs_url", gcs_url)]
-        roslaunch.launch(node)
+        """
+        pass
+        #TODO: make work after update to ROS Lunar
+        #launch("pennair2", "mavros.launch", name=self.mavros_prefix, fcu_url=fcu_url, gcs_url=gcs_url, **kwargs)

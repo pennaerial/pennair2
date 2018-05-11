@@ -45,6 +45,7 @@ class UAV(object):
         # setpoint/control stream loop, must publish setpoints to change into OFFBOARD
         self.loop_timer = rospy.Timer(rospy.Duration.from_sec(1.0 / frequency), self.__control_loop)
 
+
     def __control_loop(self, event):
         if not rospy.is_shutdown():
             if self._setpoint_mode is UAV.SetpointMode.POSITION:
@@ -251,8 +252,8 @@ class Multirotor(UAV):
             rate.sleep()
 
     def set_position(self, position, frame_id=None, heading=None, blocking=False, margin=0.5):
-        """
-        Tells multirotor to fly to maintain given position.
+        """Tells multirotor to fly to maintain given position.
+
         :param position: The setpoint position.
         :type position: PoseStamped | Pose | Point | list[int,int,int] | (int,int,int)
         :param frame_id: The frame relative to which the setpoint is set.
