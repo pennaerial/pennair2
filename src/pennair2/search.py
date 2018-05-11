@@ -1,4 +1,5 @@
 from enum import Enum
+from PID import PID
 
 class FoundAction(Enum):
     CONTINUE = 1
@@ -28,14 +29,25 @@ class BoxSearch(Search):
         self.last_pose = None
         self.last_increment = self.increment // 2
         self.last_increment_dim = "y"
+        self.velocity = None
+        self.pid = PID(1.2, 1, .001)
+        self.pid.SetPoint = self.height
+        self.pid.setSampleTime(.01)
 
     def run(self):
         if self._reached_setpoint():
             self._update_velocity()
         else:
-            #If altitude is too low, add some updward momentum
-            #If too high, add some downward momentum
-            pass
+            self._maintain_height()
+
+    def _maintain_height(self):
+        if self.velocity is None:
+            print("WARN: BoxSearch -> no velocity setpoint")
+            return
+        x, y, _ = self.velocity
+        _, _, z = self.uav.get_position(fmt="tuple")
+        self.pid.update(z)
+        self.uav.set_velocity( (x, y, self.pid.output) )
 
     def _reached_setpoint(self):
         if self.last_pose is None: 
@@ -56,11 +68,14 @@ class BoxSearch(Search):
 
         if self.last_increment_dim is "x":
             y += self.last_increment
-            self.uav.set_velocity( (0, 1, 0) )
+            v = (0, 1, 0)
         else:
             self.last_increment += self.increment
             x += self.last_increment
-            self.uav.set_velocity( (1, 0, 0) )
+            v = (1, 0, 0)
+
+        self.velocity = v
+        self.uav.set_velocity( v )
 
         self.last_pose = self.uav.generate_pose_stamped( (x, y, z) )
 

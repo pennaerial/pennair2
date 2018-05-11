@@ -79,11 +79,16 @@ class UAV(object):
     def get_relative_altitude(self):
         return self.autopilot.relative_altitude
 
-    def get_position(self, utm=False):
-        if utm:
-            return self.autopilot.global_local
-        else:
-            return self.autopilot.local_pose
+    def get_position(self, utm=False, fmt="pose"):
+        if fmt is "pose":
+            if utm:
+                return self.autopilot.global_local
+            else:
+                return self.autopilot.local_pose
+        elif fmt is "tuple":
+            p = self.get_position(utm, fmt="pose")
+            return (p.pose.position.x, p.pose.position.y, p.pose.position.z)
+
 
     @staticmethod
     def generate_pose_stamped(value, frame_id=None, heading=None):
