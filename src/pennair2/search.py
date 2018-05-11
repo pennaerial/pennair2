@@ -28,7 +28,7 @@ class BoxSearch(Search):
         self.increment = increment
         self.last_pose = None
         self.last_increment = self.increment // 2
-        self.last_increment_dim = "y"
+        self.last_increment_dim = "-y"
         self.velocity = None
         self.pid = PID(1.2, 1, .001)
         self.pid.SetPoint = self.height
@@ -52,9 +52,19 @@ class BoxSearch(Search):
     def _reached_setpoint(self):
         if self.last_pose is None: 
             return True
-        return False
-        #TODO: Don't use distance_to_target, just see if last_pose.pose.position.x/y < currentpose.x/y
-        return self.uav.distance_to_target(target=self.last_pose) < 2
+        
+        x, y, _ = self.uav.get_position(fmt="tuple")
+        if self.last_increment_dim == "+x":
+            return x > self.last_pose.pose.position.x
+        elif self.last_increment_dim == "-x":
+            return x < self.last_pose.pose.position.x
+        elif self.last_increment_dim == "+y":
+            return y > self.last_pose.pose.position.y
+        elif self.last_increment_dim == "-y":
+            return y < self.last_pose.pose.position.y
+        else:
+            print("WARN: Invalid increment_dim")
+            return False
 
     def _update_velocity(self):
         if self.last_pose is None:
@@ -66,16 +76,28 @@ class BoxSearch(Search):
             y = self.last_pose.pose.position.y
             z = self.height
 
-        if self.last_increment_dim is "x":
+        v = None
+        if self.last_increment_dim == "+x":     #+y
             y += self.last_increment
-            v = (0, 1, 0)
-        else:
+            self.velocity = (0, 1, 0)
+            self.last_increment_dim = "+y"
+        elif self.last_increment_dim == "+y":   #-x
+            self.last_increment += self.increment
+            x -= self.last_increment
+            self.velocity = (-1, 0, 0)
+            self.last_increment_dim = "-x"
+        elif self.last_increment_dim == "-x":   #-y
+            y -= self.last_increment
+            self.velocity = (0, -1, 0)
+            self.last_increment_dim = "-y"
+        elif self.last_increment_dim == "-y":   #+x
             self.last_increment += self.increment
             x += self.last_increment
-            v = (1, 0, 0)
+            self.velocity = (1, 0, 0)
+            self.last_increment_dim = "+x"
+        else:
+            print("WARN: Invalid increment_dim (_update_velocity)")
 
-        self.velocity = v
-        self.uav.set_velocity( v )
-
+        self._maintain_height()
         self.last_pose = self.uav.generate_pose_stamped( (x, y, z) )
 
