@@ -24,7 +24,7 @@
     <arg name="debug" default="false"/>
     <arg name="verbose" default="false"/>
     <arg name="paused" default="false"/>
-    <arg name="record_data" default="true"/>
+    <arg name="record_data" default="false"/>
 
     <include file="$(find px4)/launch/posix_sitl.launch">
         <arg name="x" value="$(arg x)"/>
