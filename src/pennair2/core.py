@@ -80,14 +80,15 @@ class UAV(object):
     def get_position(self, utm=False, fmt="pose"):
         if fmt is "pose":
             if utm:
-                return self.autopilot.global_local
+                pose_covariance = self.autopilot.global_local
+                return PoseStamped(pose_covariance.header, pose_covariance.pose.pose)
             else:
                 return self.autopilot.local_pose
         elif fmt is "tuple":
             p = self.get_position(utm, fmt="pose")
             return (p.pose.position.x, p.pose.position.y, p.pose.position.z)
 
-    def set_position(self, value, frame_id=None, heading=None):
+    def set_position(self, value, frame_id="map", heading=None):
         """
 
         :param value: The desired position setpoint, only yaw component of orientation is used. Can be of type
@@ -107,14 +108,25 @@ class UAV(object):
         msg = to_pose_stamped(value, frame_id, heading)
 
         # transform to map frame
+        msg = self.transform_pose(msg, "map", 1.0)
+        if msg is not None:
+            self._setpoint_pos = msg
+            self._setpoint_mode = UAV.SetpointMode.POSITION
+
+    def transform_pose(self, pose, target, timeout=1.0):
+        # type: (PoseStamped, str, float) -> PoseStamped | None
         try:
-            transform = self.tf_buffer.lookup_transform("map", msg.header.frame_id, rospy.Time.now(), rospy.Duration(1))
-            msg = tf2_geometry_msgs.do_transform_pose(msg, transform)
+            transform = self.tf_buffer.lookup_transform(
+                target,
+                pose.header.frame_id,
+                rospy.Time.now(),
+                rospy.Duration.from_sec(timeout)
+            )
+            pose = tf2_geometry_msgs.do_transform_pose(pose, transform)
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
             rospy.logerr("Transforming setpoint failed: " + str(e))
-
-        self._setpoint_pos = msg
-        self._setpoint_mode = UAV.SetpointMode.POSITION
+            return None
+        return pose
 
     def get_velocity(self):
         return self.autopilot.local_twist
@@ -204,6 +216,7 @@ class Multirotor(UAV):
         self.set_velocity([0, 0, abs(speed)])
         rospy.loginfo("Waiting for offboard.")
         self.wait_for(lambda: self.is_offboard)
+        rospy.loginfo("Takeoff!")
 
         rate = rospy.Rate(self.frequency)
         while self.autopilot.relative_altitude < target_height:
@@ -218,7 +231,7 @@ class Multirotor(UAV):
         while self.is_armed:
             rate.sleep()
 
-    def set_position(self, position, frame_id=None, heading=None, blocking=False, margin=0.5):
+    def set_position(self, position, frame_id="map", heading=None, blocking=False, margin=0.5):
         """Tells multirotor to fly to maintain given position.
 
         :param position: The setpoint position.

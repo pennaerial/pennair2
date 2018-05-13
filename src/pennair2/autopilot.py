@@ -50,7 +50,7 @@ class Autopilot:
         The global position in UTM coordinates.
         UTM coordinates are used to define position on Earth using a Euclidean coordinate system.
         :return: Global position in local frame
-        :rtype: Odometry
+        :rtype: PoseWithCovarianceStamped
         """
         return deepcopy(self._global_local)
 
