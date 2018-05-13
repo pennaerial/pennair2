@@ -4,6 +4,9 @@
 from core import UAV
 import copy
 
+from pennair2.conversions import to_pose_stamped
+
+
 class Swarm():
     def __init__(self):
         self.members = []
@@ -27,7 +30,7 @@ class Swarm():
         :param heading: Your desired heading.
         :type heading: int
         """
-        origin_msg = UAV.generate_pose_stamped(value, frame_id, heading)
+        origin_msg = to_pose_stamped(frame_id, heading)
         poses = self.get_swarm_poses(origin_msg)
         for uav, pose in zip(self.members, poses):
             uav.set_position(pose)

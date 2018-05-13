@@ -7,11 +7,10 @@ import tf2_ros
 import tf2_geometry_msgs
 import math
 from autopilot import Autopilot, Mavros
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 from geometry_msgs.msg import PoseStamped, Pose, Point, TwistStamped, Twist, Vector3
-from tf_conversions import transformations
 from enum import Enum
-from conversions import position_to_numpy
+from .conversions import to_numpy, to_pose_stamped
 
 
 class UAV(object):
@@ -45,7 +44,6 @@ class UAV(object):
         # setpoint/control stream loop, must publish setpoints to change into OFFBOARD
         self.loop_timer = rospy.Timer(rospy.Duration.from_sec(1.0 / frequency), self.__control_loop)
 
-
     def __control_loop(self, event):
         if not rospy.is_shutdown():
             if self._setpoint_mode is UAV.SetpointMode.POSITION:
@@ -64,11 +62,11 @@ class UAV(object):
             return self.autopilot.state.mode == "OFFBOARD"
 
     def wait(self, seconds, rate=30):
-        rospy.sleep(seconds/rate)
+        rospy.sleep(seconds / rate)
 
     def wait_for(self, fun, rate=30, wait_val=True):
         while not fun() == wait_val:
-            rospy.sleep(1.0/rate)
+            rospy.sleep(1.0 / rate)
 
     def get_gps(self):
         return self.autopilot.global_global
@@ -89,51 +87,6 @@ class UAV(object):
             p = self.get_position(utm, fmt="pose")
             return (p.pose.position.x, p.pose.position.y, p.pose.position.z)
 
-
-    @staticmethod
-    def generate_pose_stamped(value, frame_id=None, heading=None):
-        """
-
-        :param value: The desired position setpoint, only yaw component of orientation is used. Can be of type
-            PoseStamped, Pose, Point, or an indexable object with 3 integer elements (list, tuple, numpy array etc.)
-        :type value: PoseStamped | Pose | Point | list[int,int,int] | (int,int,int)
-        :param frame_id: The name of the frame to use for the message.
-        :type frame_id: str
-        :param heading: Your desired heading.
-        :type heading: int
-        """
-        if isinstance(value, PoseStamped):
-            msg = value
-        else:
-            msg = PoseStamped()
-            if isinstance(value, Pose):  # if Pose then position and orientation already provided
-                msg.pose = value
-            else:
-                if isinstance(value, Point):
-                    msg.pose.position = value
-                else:
-                    msg.pose.position.x = value[0]
-                    msg.pose.position.y = value[1]
-                    msg.pose.position.z = value[2]
-                
-                if heading is not None:
-                    q = transformations.quaternion_from_euler(0, 0, heading)
-                    msg.pose.orientation.x = q[0]
-                    msg.pose.orientation.y = q[1]
-                    msg.pose.orientation.z = q[2]
-                    msg.pose.orientation.w = q[3]
-                else:
-                    msg.pose.orientation.x = 0
-                    msg.pose.orientation.y = 0
-                    msg.pose.orientation.z = 0
-                    msg.pose.orientation.w = 0
-
-        if frame_id is not None:
-            if isinstance(frame_id, str):
-                msg.header.frame_id = frame_id
-        msg.header.stamp = rospy.Time.now()
-        return msg
-
     def set_position(self, value, frame_id=None, heading=None):
         """
 
@@ -141,6 +94,7 @@ class UAV(object):
             PoseStamped, Pose, Point, or an indexable object with 3 integer elements (list, tuple, numpy array etc.)
         :type value: PoseStamped | Pose | Point | list[int,int,int] | (int,int,int)
         :param frame_id: The name of the frame to use for the message.
+            Will only be applied if value is not already PoseStamped.
         :type frame_id: str
         :param heading: Your desired heading.
         :type heading: int
@@ -150,7 +104,15 @@ class UAV(object):
                 heading = self._setpoint_heading
             else:
                 heading = self.get_heading()
-        msg = self.generate_pose_stamped(value, frame_id, heading)
+        msg = to_pose_stamped(value, frame_id, heading)
+
+        # transform to map frame
+        try:
+            transform = self.tf_buffer.lookup_transform("map", msg.header.frame_id, rospy.Time.now(), rospy.Duration(1))
+            msg = tf2_geometry_msgs.do_transform_pose(msg, transform)
+        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
+            rospy.logerr("Transforming setpoint failed: " + str(e))
+
         self._setpoint_pos = msg
         self._setpoint_mode = UAV.SetpointMode.POSITION
 
@@ -189,7 +151,7 @@ class UAV(object):
         self._setpoint_mode = UAV.SetpointMode.VELOCITY
 
     def distance_to_target(self, target=None, current=None, frame_id=None):
-        d = position_to_numpy(self.displacement_from_target(target, current, frame_id))
+        d = to_numpy(self.displacement_from_target(target, current, frame_id))
         return np.linalg.norm(d)
 
     def displacement_from_target(self, target=None, current=None, frame_id=None):

@@ -1,5 +1,7 @@
 from enum import Enum
 from PID import PID
+from pennair2.conversions import to_pose_stamped
+
 
 class FoundAction(Enum):
     CONTINUE = 1
@@ -99,5 +101,5 @@ class BoxSearch(Search):
             print("WARN: Invalid increment_dim (_update_velocity)")
 
         self._maintain_height()
-        self.last_pose = self.uav.generate_pose_stamped( (x, y, z) )
+        self.last_pose = to_pose_stamped((x, y, z))
 
