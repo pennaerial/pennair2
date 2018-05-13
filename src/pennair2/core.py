@@ -78,6 +78,7 @@ class UAV(object):
         return self.autopilot.relative_altitude
 
     def get_position(self, utm=False, fmt="pose"):
+        # type: (bool, str) -> PoseStamped
         if fmt is "pose":
             if utm:
                 pose_covariance = self.autopilot.global_local
@@ -85,6 +86,7 @@ class UAV(object):
             else:
                 return self.autopilot.local_pose
         elif fmt is "tuple":
+            rospy.logwarn("Get position as tuple is deprecated. Use conversions.to_numpy instead.")
             p = self.get_position(utm, fmt="pose")
             return (p.pose.position.x, p.pose.position.y, p.pose.position.z)
 
