@@ -21,7 +21,6 @@
 
 
     <buildtool_depend>catkin</buildtool_depend>
-    <depend>python-rospy</depend>
     <depend>rostest</depend>
     <depend>rospy</depend>
     <depend>python-utm-pip</depend>
