@@ -32,24 +32,31 @@ class BoxSearch(Search):
         self.last_increment = self.increment // 2
         self.last_increment_dim = "-y"
         self.velocity = None
-        self.pid = PID(1.2, 1, .001)
-        self.pid.SetPoint = self.height
-        self.pid.setSampleTime(.01)
+        self.pidz = PID(1.2, 1, .001)
+        self.pidz.SetPoint = self.height
+        self.pidz.setSampleTime(.01)
+        self.pidxy = None
 
     def run(self):
         if self._reached_setpoint():
             self._update_velocity()
         else:
-            self._maintain_height()
+            self._pid_loop()
 
-    def _maintain_height(self):
+    def _pid_loop(self):
         if self.velocity is None:
             print("WARN: BoxSearch -> no velocity setpoint")
             return
         x, y, _ = self.velocity
-        _, _, z = self.uav.get_position(fmt="tuple")
-        self.pid.update(z)
-        self.uav.set_velocity( (x, y, self.pid.output) )
+        cx, cy, cz = self.uav.get_position(fmt="tuple")
+        if x == 0:
+            self.pidxy.update(cx)
+            x = self.pidxy.output
+        else: #y = 0
+            self.pidxy.update(cy)
+            y = self.pidxy.output
+        self.pidz.update(cz)
+        self.uav.set_velocity( (x, y, self.pidz.output) )
 
     def _reached_setpoint(self):
         if self.last_pose is None: 
@@ -79,27 +86,33 @@ class BoxSearch(Search):
             z = self.height
 
         v = None
+        self.pidxy = PID(1.2, 1, .001)
+        self.pidxy.setSampleTime(.01)
         if self.last_increment_dim == "+x":     #+y
             y += self.last_increment
             self.velocity = (0, 1, 0)
             self.last_increment_dim = "+y"
+            self.pidxy.SetPoint = x
         elif self.last_increment_dim == "+y":   #-x
             self.last_increment += self.increment
             x -= self.last_increment
             self.velocity = (-1, 0, 0)
             self.last_increment_dim = "-x"
+            self.pidxy.SetPoint = y
         elif self.last_increment_dim == "-x":   #-y
             y -= self.last_increment
             self.velocity = (0, -1, 0)
             self.last_increment_dim = "-y"
+            self.pidxy.SetPoint = x
         elif self.last_increment_dim == "-y":   #+x
             self.last_increment += self.increment
             x += self.last_increment
             self.velocity = (1, 0, 0)
             self.last_increment_dim = "+x"
+            self.pidxy.SetPoint = y
         else:
             print("WARN: Invalid increment_dim (_update_velocity)")
 
-        self._maintain_height()
+        self._pid_loop()
         self.last_pose = to_pose_stamped((x, y, z))
 
