@@ -51,13 +51,13 @@ class LocalizationNode(Node):
              True, True, True]
         self.add_source("imu0", mavros_prefix+"/imu/data", imu_matrix)
 
-        odom_matrix = \
-            [True, True, True,
-             False, False, False,
-             False, False, False,
-             False, False, False,
-             False, False, False]
-        self.add_source("odom0", mavros_prefix + "/global_position/local", odom_matrix)
+        #odom_matrix = \
+        #    [True, True, True,
+        #     False, False, False,
+        #     False, False, False,
+        #     False, False, False,
+        #     False, False, False]
+        #self.add_source("odom0", mavros_prefix + "/global_position/local", odom_matrix)
 
         if gps:
             gps_matrix = \
