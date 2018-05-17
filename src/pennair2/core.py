@@ -248,6 +248,8 @@ class Multirotor(UAV):
         :type margin: float
         """
         UAV.set_position(self, position, frame_id, heading)
+        if not blocking:
+            return
         rate = rospy.Rate(self.frequency)
         while self.distance_to_target() > margin:
             rate.sleep()
