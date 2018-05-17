@@ -12,6 +12,7 @@ from geometry_msgs.msg import PoseStamped, Pose, Point, TwistStamped, Twist, Vec
 from enum import Enum
 from .conversions import to_numpy, to_pose_stamped
 
+_tuple_warn = False
 
 class UAV(object):
     class SetpointMode(Enum):
@@ -86,7 +87,10 @@ class UAV(object):
             else:
                 return self.autopilot.local_pose
         elif fmt is "tuple":
-            rospy.logwarn("Get position as tuple is deprecated. Use conversions.to_numpy instead.")
+            global _tuple_warn
+            if not _tuple_warn:
+                rospy.logwarn("Get position as tuple is deprecated. Use conversions.to_numpy instead.")
+                _tuple_warn = True
             p = self.get_position(utm, fmt="pose")
             return (p.pose.position.x, p.pose.position.y, p.pose.position.z)
 
