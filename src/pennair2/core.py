@@ -239,8 +239,8 @@ class Multirotor(UAV):
         while self.autopilot.relative_altitude < target_height:
             position = conversions.to_numpy(self.get_position())
             error = takeoff_location - position
-            pid_x.update(error[0][0])
-            pid_x.update(error[0][1])
+            pid_x.update(error[0])
+            pid_x.update(error[1])
             self.set_velocity([pid_x.output, pid_y.output, abs(speed)])
             rate.sleep()
         self.hover()
@@ -255,11 +255,11 @@ class Multirotor(UAV):
         pid_x.setSampleTime(1.0 / self.frequency)
         pid_y.setSampleTime(1.0 / self.frequency)
         rate = rospy.Rate(self.frequency)
-        while self.is_armed():
+        while self.is_armed:
             position = conversions.to_numpy(self.get_position())
             error = land_location - position
-            pid_x.update(error[0][0])
-            pid_x.update(error[0][1])
+            pid_x.update(error[0])
+            pid_x.update(error[1])
             self.set_velocity([pid_x.output, pid_y.output, -abs(speed)])
             rate.sleep()
 
