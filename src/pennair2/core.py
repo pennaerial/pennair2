@@ -240,7 +240,7 @@ class Multirotor(UAV):
             position = conversions.to_numpy(self.get_position())
             error = takeoff_location - position
             pid_x.update(error[0])
-            pid_x.update(error[1])
+            pid_y.update(error[1])
             self.set_velocity([pid_x.output, pid_y.output, abs(speed)])
             rate.sleep()
         self.hover()
@@ -259,7 +259,7 @@ class Multirotor(UAV):
             position = conversions.to_numpy(self.get_position())
             error = land_location - position
             pid_x.update(error[0])
-            pid_x.update(error[1])
+            pid_y.update(error[1])
             self.set_velocity([pid_x.output, pid_y.output, -abs(speed)])
             rate.sleep()
 
