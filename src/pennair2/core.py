@@ -10,7 +10,10 @@ from autopilot import Autopilot, Mavros
 from abc import ABCMeta
 from geometry_msgs.msg import PoseStamped, Pose, Point, TwistStamped, Twist, Vector3
 from enum import Enum
+
+from pennair2 import conversions
 from .conversions import to_numpy, to_pose_stamped
+from pennair2.PID import PID
 
 GET_POSITION_TUPLE_WARN = False
 
@@ -21,6 +24,7 @@ class UAV(object):
         ACCELERATION = 3
 
     def __init__(self, autopilot, frequency=30):
+        # type: (Autopilot, float) -> None
         """
 
         :param autopilot: An autopilot object to use.
@@ -28,7 +32,7 @@ class UAV(object):
         """
         __metaclass__ = ABCMeta
 
-        self.frequency = frequency
+        self.frequency = float(frequency)
         self.autopilot = autopilot
         self.tf_buffer = tf2_ros.Buffer(rospy.Duration(120))  # tf buffer length in seconds
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)  # type: tf2_ros.TransformListener
@@ -212,29 +216,51 @@ class Multirotor(UAV):
         :type autopilot: Autopilot
         """
         UAV.__init__(self, autopilot, frequency=frequency)
+        self.home = self.get_position()
 
     def hover(self):
         self.set_position(self.get_position())
 
     def takeoff(self, speed=1, target_height=10):
+        # type: (float, float) -> None
         rospy.loginfo("Waiting for arm.")
         self.wait_for(lambda: self.is_armed)
-        self.set_velocity([0, 0, abs(speed)])
+        self.set_velocity([0, 0, 0])
         rospy.loginfo("Waiting for offboard.")
         self.wait_for(lambda: self.is_offboard)
         rospy.loginfo("Takeoff!")
 
+        takeoff_location = conversions.to_numpy(self.get_position())
+        pid_x = PID(0.5, 0.0, 0.1)
+        pid_y = PID(0.5, 0.0, 0.1)
+        pid_x.setSampleTime(1.0 / self.frequency)
+        pid_y.setSampleTime(1.0 / self.frequency)
         rate = rospy.Rate(self.frequency)
         while self.autopilot.relative_altitude < target_height:
+            position = conversions.to_numpy(self.get_position())
+            error = takeoff_location - position
+            pid_x.update(error[0])
+            pid_y.update(error[1])
+            self.set_velocity([pid_x.output, pid_y.output, abs(speed)])
             rate.sleep()
         self.hover()
 
-    def land(self, speed=0.5):
+    def land(self, speed=0.5, target=None):
+        # type: (float, PoseStamped) -> None
         self.hover()
-        rospy.sleep(5)
-        self.set_velocity([0, 0, -abs(speed)])
+        rospy.sleep(1)  # wait to stabilize
+        land_location = conversions.to_numpy(self.get_position())
+        pid_x = PID(0.5, 0.0, 0.1)
+        pid_y = PID(0.5, 0.0, 0.1)
+        pid_x.setSampleTime(1.0 / self.frequency)
+        pid_y.setSampleTime(1.0 / self.frequency)
         rate = rospy.Rate(self.frequency)
         while self.is_armed:
+            position = conversions.to_numpy(self.get_position())
+            error = land_location - position
+            pid_x.update(error[0])
+            pid_y.update(error[1])
+            self.set_velocity([pid_x.output, pid_y.output, -abs(speed)])
             rate.sleep()
 
     def set_position(self, position, frame_id="map", heading=None, blocking=False, margin=0.5):
