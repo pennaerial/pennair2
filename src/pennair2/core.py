@@ -3,6 +3,7 @@
 
 import numpy as np
 import rospy
+from tf import transformations
 import tf2_ros
 import tf2_geometry_msgs
 import math
@@ -98,29 +99,99 @@ class UAV(object):
             p = self.get_position(utm, fmt="pose")
             return (p.pose.position.x, p.pose.position.y, p.pose.position.z)
 
-    def set_position(self, value, frame_id="map", heading=None):
-        """
-
-        :param value: The desired position setpoint, only yaw component of orientation is used. Can be of type
-            PoseStamped, Pose, Point, or an indexable object with 3 integer elements (list, tuple, numpy array etc.)
-        :type value: PoseStamped | Pose | Point | list[int,int,int] | (int,int,int)
-        :param frame_id: The name of the frame to use for the message.
-            Will only be applied if value is not already PoseStamped.
-        :type frame_id: str
-        :param heading: Your desired heading.
-        :type heading: int
-        """
+    def compute_pose(self,position,heading=None,frame_id='map'):
+        # converts a position, heading, and frame_id into a pose
+        # compute pose
         if heading is None:
             if self._setpoint_heading is not None:
                 heading = self._setpoint_heading
             else:
                 heading = self.get_heading()
         msg = to_pose_stamped(value, frame_id, heading)
-
         # transform to map frame
         msg = self.transform_pose(msg, "map", 1.0)
+        return msg
+
+    def set_position(self, position, heading=None, relative=False, frame_id="map"):
+        """
+        :param value: The desired position setpoint, only yaw component of orientation is used. Can be of type
+            PoseStamped, Pose, Point, or an indexable object with 3 integer elements (list, tuple, numpy array etc.)
+        :type value: PoseStamped | Pose | Point | list[int,int,int] | (int,int,int)
+        :param frame_id: The name of the frame to use for the message.
+            Will only be applied if value is not already PoseStamped.
+        :type frame_id: str
+        :param heading: Yaw in degrees
+        :type heading: int
+        """
+        msg = self.compute_pose(position=position,heading=heading,frame_id=frame_id)
         if msg is not None:
-            self._setpoint_pos = msg
+            if relative:
+                pos = self.get_position()
+                self._setpoint_pos = msg.pose.position.x + pos.pose.position.x
+                self._setpoint_pos = msg.pose.position.y + pos.pose.position.y
+                self._setpoint_pos = msg.pose.position.z + pos.pose.position.z
+                self.set_yaw(heading,relative=True,frame_id=frame_id)
+            else:
+                self._setpoint_pos = msg
+            self._setpoint_mode = UAV.SetpointMode.POSITION
+
+    def cancel_setpoint(self):
+        setpoint = self.get_position()
+        self._setpoint_pos = msg
+        self._setpoint_mode = UAV.SetpointMode.POSITION
+
+    def set_x(self,x,relative=False,frame_id='map'):
+        if self._setpoint_pos is not None:
+            setpoint = self._setpoint_pos
+        else:
+            setpoint = self.get_position()
+        if relative:
+            x += self.get_position().pose.position.x
+        xpose = self.compute_pose([x,0,0],frame_id=frame_id)
+        if xpose is not None:
+            setpint.pose.position.x = xpose.pose.position.x
+            self._setpoint_pos = setpoint
+            self._setpoint_mode = UAV.SetpointMode.POSITION
+
+    def set_y(self,y,relative=False,frame_id='map'):
+        if self._setpoint_pos is not None:
+            setpoint = self._setpoint_pos
+        else:
+            setpoint = self.get_position()
+        if relative:
+            y += self.get_position().pose.position.y
+        ypose = self.compute_pose([0,y,0],frame_id=frame_id)
+        if ypose is not None:
+            setpint.pose.position.y = ypose.pose.position.y
+            self._setpoint_pos = setpoint
+            self._setpoint_mode = UAV.SetpointMode.POSITION
+
+    def set_z(self,z,relative=False,frame_id='map'):
+        if self._setpoint_pos is not None:
+            setpoint = self._setpoint_pos
+        else:
+            setpoint = self.get_position()
+        if relative:
+            z += self.get_position().pose.position.z
+        zpose = self.compute_pose([0,0,z],frame_id=frame_id)
+        if zpose is not None:
+            setpint.pose.position.z = zpose.pose.position.z
+            self._setpoint_pos = setpoint
+            self._setpoint_mode = UAV.SetpointMode.POSITION
+
+    def set_yaw(self,yaw,relative=False,frame_id='map'):
+        # sets yaw in degrees
+        heading = (math.pi /180.0) * yaw
+        if self._setpoint_pos is not None:
+            setpoint = self._setpoint_pos
+        else:
+            setpoint = self.get_position()
+        if relative:
+            heading += transformations.euler_from_quaternion(self.get_position().orientation)[2] # indexes yaw from (roll,pitch,yaw)
+        hpose = self.compute_pose([0,0,0],heading=heading,frame_id=frame_id)
+        if hpose is not None:
+            setpint.pose.orientation = hpose.pose.orientation
+            self._setpoint_pos = setpoint
             self._setpoint_mode = UAV.SetpointMode.POSITION
 
     def transform_pose(self, pose, target, timeout=1.0):
@@ -263,7 +334,7 @@ class Multirotor(UAV):
             self.set_velocity([pid_x.output, pid_y.output, -abs(speed)])
             rate.sleep()
 
-    def set_position(self, position, frame_id="map", heading=None, blocking=False, margin=0.5):
+    def set_position(self, position, frame_id="map", heading=None, blocking=False, margin=0.5, relative=False):
         """Tells multirotor to fly to maintain given position.
 
         :param position: The setpoint position.
@@ -277,7 +348,39 @@ class Multirotor(UAV):
         :param margin: The setpoint margin. Only matters if blocking is true.
         :type margin: float
         """
-        UAV.set_position(self, position, frame_id, heading)
+        UAV.set_position(self, position=position, heading=heading, relative=relative, frame_id=frame_id)
+        if not blocking:
+            return
+        rate = rospy.Rate(self.frequency)
+        while self.distance_to_target() > margin:
+            rate.sleep()
+
+    def set_x(self, x, relative=False, blocking=False, margin=0.5, frame_id="map"):
+        UAV.set_x(self, x, relative=relative, frame_id=frame_id)
+        if not blocking:
+            return
+        rate = rospy.Rate(self.frequency)
+        while self.distance_to_target() > margin:
+            rate.sleep()
+
+    def set_y(self, y, relative=False, blocking=False, margin=0.5, frame_id="map"):
+        UAV.set_y(self, y, relative=relative, frame_id=frame_id)
+        if not blocking:
+            return
+        rate = rospy.Rate(self.frequency)
+        while self.distance_to_target() > margin:
+            rate.sleep()
+
+    def set_z(self, z, relative=False, blocking=False, margin=0.5, frame_id="map"):
+        UAV.set_z(self, z, relative=relative, frame_id=frame_id)
+        if not blocking:
+            return
+        rate = rospy.Rate(self.frequency)
+        while self.distance_to_target() > margin:
+            rate.sleep()
+
+    def set_yaw(self, yaw, relative=False, blocking=False, margin=0.5, frame_id="map"):
+        UAV.set_yaw(self, yaw, relative=relative, frame_id=frame_id)
         if not blocking:
             return
         rate = rospy.Rate(self.frequency)
