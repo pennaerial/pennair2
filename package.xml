@@ -3,45 +3,26 @@
     <name>pennair2</name>
     <version>2.0.0</version>
     <description>The second generation Penn AiR library..</description>
-
-    <!-- One maintainer tag required, multiple allowed, one person per tag -->
-    <!-- Example:  -->
-    <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
     <maintainer email="owerko@sas.upenn.edu">Damian Owerko</maintainer>
-
-
-    <!-- One license tag required, multiple allowed, one license per tag -->
-    <!-- Commonly used lic=ense strings: -->
-    <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
-    <license>Please see the attaches LICENSE. Contact the maintainer for licensing.</license>
+    <license>Please see the attached LICENSE. Contact the maintainer for licensing.</license>
 
 
     <!-- Url tags are optional, but mutiple are allowed, one per tag -->
     <!-- Optional attribute type can be: website, bugtracker, or repository -->
     <!-- Example: -->
-    <!-- <url type="website">http://wiki.ros.org/hello_catkin</url> -->
+    <url type="website">https://github.com/pennaerial/pennair2</url>
 
 
     <!-- Author tags are optional, mutiple are allowed, one per tag -->
     <!-- Authors do not have to be maintianers, but could be -->
     <!-- Example: -->
     <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
+    <author email="owerko@sas.upenn.edu">Damian Owerko</author>
 
 
-    <!-- The *_depend tags are used to specify dependencies -->
-    <!-- Dependencies can be catkin packages or system dependencies -->
-    <!-- Examples: -->
-    <!-- Use depend for packages you need at compile time: -->
-    <!--   <depend>message_generation</depend> -->
-    <!-- Use buildtool_depend for build tool packages: -->
-    <!--   <buildtool_depend>catkin</buildtool_depend> -->
-    <!-- Use depend for packages you need at runtime: -->
-    <!--   <depend>message_runtime</depend> -->
-    <!-- Use test_depend for packages you need only for testing: -->
-    <!--   <test_depend>gtest</test_depend> -->
     <buildtool_depend>catkin</buildtool_depend>
+    <depend>rostest</depend>
     <depend>rospy</depend>
-    <test_depend>rostest</test_depend>
     <depend>python-utm-pip</depend>
     <depend>python-numpy</depend>
     <depend>tf2</depend>
