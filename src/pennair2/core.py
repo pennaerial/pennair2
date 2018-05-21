@@ -236,8 +236,10 @@ class Multirotor(UAV):
     def land(self, speed=0.5, target=None):
         # type: (float, PoseStamped) -> None
         self.hover()
-        conversions.to_numpy(self.get_pose())
+        position = self.get_position()
         rospy.sleep(1)  # wait to stabilize
+        position[2] = 5  # 5m above ground
+        self.set_position(position)
         self._vertical_pid(lambda: self.is_armed, speed=-abs(speed))
 
 
