@@ -39,8 +39,7 @@ def mets_to_knots(mets):
 
 def NavSatFix_to_PoseStamped(gps, force_utm_zone=None):
     # type: (NavSatFix | list[float,float,float] | (float,float,float), int) -> PoseStamped
-    """
-    Convert GPS to UTM position.
+    """Convert GPS to UTM position.
 
     :param gps: A gps position. If list/tuple given then (longitude, latitude, altitude). Altitude in WSG84.
     :param force_utm_zone: If not None, then will force utm zone as specified.
@@ -62,19 +61,16 @@ def NavSatFix_to_PoseStamped(gps, force_utm_zone=None):
     return pose_stamped
 
 
-def gps_to_utm(latitude, longitude, altitude, force_utm_zone=None):
-    # type: (float, float, float, int) -> (np.ndarray, zone_letter, zone_number)
-    """
-    Convert GPS to UTM position.
+def gps_to_utm(gps, force_utm_zone=None):
+    # type: (list[float, float, float], int) -> np.ndarray
+    """Convert GPS to UTM position. Use NavSatFix_to_PoseStamped for converting between such messages.
 
-    :param latitude: GPS latitude.
-    :param longitude: GPS longitude.
-    :param altitude: Altitude in WSG84.
+    :param gps: List of [latitude, longitude, altitude]
     :param force_utm_zone: If not None, then will force utm zone as specified.
     :return: UTM position in ENU and the zone number.
     """
-    (easting, northing, zone_number, zone_letter) = utm.from_latlon(latitude, longitude, force_utm_zone)
-    return np.array([[easting, northing, altitude]]).T
+    (easting, northing, zone_number, zone_letter) = utm.from_latlon(gps[0], gps[1], force_utm_zone)
+    return np.array([[easting, northing, gps[2]]]).T
 
 
 def to_numpy(position):
