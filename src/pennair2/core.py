@@ -15,7 +15,6 @@ from pennair2 import conversions
 from .conversions import to_numpy, to_pose_stamped
 from pennair2.PID import PID
 
-GET_POSITION_TUPLE_WARN = False
 
 class UAV(object):
     class SetpointMode(Enum):
@@ -90,13 +89,6 @@ class UAV(object):
                 return PoseStamped(pose_covariance.header, pose_covariance.pose.pose)
             else:
                 return self.autopilot.local_pose
-        elif fmt is "tuple":
-            global GET_POSITION_TUPLE_WARN
-            if not GET_POSITION_TUPLE_WARN:
-                rospy.logwarn("Get position as tuple is deprecated. Use conversions.to_numpy instead.")
-                GET_POSITION_TUPLE_WARN = True
-            p = self.get_pose(utm, fmt="pose")
-            return (p.pose.position.x, p.pose.position.y, p.pose.position.z)
 
     def get_position(self, utm=False):
         if utm:
@@ -238,21 +230,7 @@ class Multirotor(UAV):
         rospy.loginfo("Waiting for offboard.")
         self.wait_for(lambda: self.is_offboard)
         rospy.loginfo("Takeoff!")
-
-        takeoff_location = conversions.to_numpy(self.get_position())
-        pid_x = PID(0.5, 0.0, 0.1)
-        pid_y = PID(0.5, 0.0, 0.1)
-        pid_x.SetPoint = takeoff_location[0]
-        pid_y.SetPoint = takeoff_location[1]
-        pid_x.setSampleTime(1.0 / self.frequency)
-        pid_y.setSampleTime(1.0 / self.frequency)
-        rate = rospy.Rate(self.frequency)
-        while self.autopilot.relative_altitude < target_height:
-            position = conversions.to_numpy(self.get_position())
-            pid_x.update(position[0])
-            pid_y.update(position[1])
-            self.set_velocity([pid_x.output, pid_y.output, abs(speed)])
-            rate.sleep()
+        self._vertical_pid(lambda: self.autopilot.relative_altitude < target_height, speed=abs(speed))
         self.hover()
 
     def land(self, speed=0.5, target=None):
@@ -260,19 +238,25 @@ class Multirotor(UAV):
         self.hover()
         conversions.to_numpy(self.get_pose())
         rospy.sleep(1)  # wait to stabilize
-        land_location = conversions.to_numpy(self.get_position())
-        pid_x = PID(0.5, 0.0, 0.1)
-        pid_y = PID(0.5, 0.0, 0.1)
-        pid_x.SetPoint = land_location[0]
-        pid_y.SetPoint = land_location[1]
-        pid_x.setSampleTime(1.0 / self.frequency)
-        pid_y.setSampleTime(1.0 / self.frequency)
-        rate = rospy.Rate(self.frequency)
-        while self.is_armed:
-            position = conversions.to_numpy(self.get_position())
+        self._vertical_pid(lambda: self.is_armed, speed=-abs(speed))
+
+
+    def _vertical_pid(self, condition, p=5.0, i=0.0,  d=1.0, speed=0.0, frequency=None):
+        if frequency is None:
+            frequency = self.frequency
+        location = conversions.to_numpy(self.get_pose())
+        pid_x = PID(p, i, d)
+        pid_y = PID(p, i, d)
+        pid_x.SetPoint = location[0]
+        pid_y.SetPoint = location[1]
+        pid_x.setSampleTime(1.0 / frequency)
+        pid_y.setSampleTime(1.0 / frequency)
+        rate = rospy.Rate(frequency)
+        while condition():
+            position = conversions.to_numpy(self.get_pose())
             pid_x.update(position[0])
             pid_y.update(position[1])
-            self.set_velocity([pid_x.output, pid_y.output, -abs(speed)])
+            self.set_velocity([pid_x.output, pid_y.output, speed], "map")
             rate.sleep()
 
     def set_position(self, position, frame_id="map", heading=None, blocking=False, margin=0.5):
