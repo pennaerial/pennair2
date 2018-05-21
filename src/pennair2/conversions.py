@@ -37,7 +37,7 @@ def mets_to_knots(mets):
     return 1.94384449244 * mets
 
 
-def gps_to_utm(gps, force_utm_zone=None):
+def NavSatFix_to_PoseStamped(gps, force_utm_zone=None):
     # type: (NavSatFix | list[float,float,float] | (float,float,float), int) -> PoseStamped
     """
     Convert GPS to UTM position.
@@ -60,6 +60,21 @@ def gps_to_utm(gps, force_utm_zone=None):
         pose_stamped.pose.position.y = northing
         pose_stamped.pose.position.z = gps[2]
     return pose_stamped
+
+
+def gps_to_utm(latitude, longitude, altitude, force_utm_zone=None):
+    # type: (float, float, float, int) -> (np.ndarray, zone_letter, zone_number)
+    """
+    Convert GPS to UTM position.
+
+    :param latitude: GPS latitude.
+    :param longitude: GPS longitude.
+    :param altitude: Altitude in WSG84.
+    :param force_utm_zone: If not None, then will force utm zone as specified.
+    :return: UTM position in ENU and the zone number.
+    """
+    (easting, northing, zone_number, zone_letter) = utm.from_latlon(latitude, longitude, force_utm_zone)
+    return np.array([[easting, northing, altitude]]).T
 
 
 def to_numpy(position):
