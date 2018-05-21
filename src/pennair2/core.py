@@ -97,7 +97,7 @@ class UAV(object):
             return conversions.to_numpy(pose_stamped), pose_stamped.header.frame_id
         else:
             pose_stamped = self.autopilot.local_pose
-            return to_numpy(pose_stamped), pose_stamped.header.frame_id
+            return to_numpy(pose_stamped)
 
     def set_position(self, value, frame_id="map", heading=None):
         """
