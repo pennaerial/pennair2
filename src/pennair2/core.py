@@ -82,7 +82,7 @@ class UAV(object):
     def get_relative_altitude(self):
         return self.autopilot.relative_altitude
 
-    def get_position(self, utm=False, fmt="pose"):
+    def get_pose(self, utm=False, fmt="pose"):
         # type: (bool, str) -> PoseStamped
         if fmt is "pose":
             if utm:
@@ -95,7 +95,7 @@ class UAV(object):
             if not GET_POSITION_TUPLE_WARN:
                 rospy.logwarn("Get position as tuple is deprecated. Use conversions.to_numpy instead.")
                 GET_POSITION_TUPLE_WARN = True
-            p = self.get_position(utm, fmt="pose")
+            p = self.get_pose(utm, fmt="pose")
             return (p.pose.position.x, p.pose.position.y, p.pose.position.z)
 
     def set_position(self, value, frame_id="map", heading=None):
@@ -180,7 +180,7 @@ class UAV(object):
         if target is None:
             target = self._setpoint_pos
         if current is None:
-            current = self.get_position()
+            current = self.get_pose()
 
         if frame_id is not None:
             transform1 = self.tf_buffer.lookup_transform(frame_id,
@@ -216,10 +216,10 @@ class Multirotor(UAV):
         :type autopilot: Autopilot
         """
         UAV.__init__(self, autopilot, frequency=frequency)
-        self.home = self.get_position()
+        self.home = self.get_pose()
 
     def hover(self):
-        self.set_position(self.get_position())
+        self.set_position(self.get_pose())
 
     def takeoff(self, speed=1, target_height=10):
         # type: (float, float) -> None
@@ -249,6 +249,7 @@ class Multirotor(UAV):
     def land(self, speed=0.5, target=None):
         # type: (float, PoseStamped) -> None
         self.hover()
+        conversions.to_numpy(self.get_pose())
         rospy.sleep(1)  # wait to stabilize
         land_location = conversions.to_numpy(self.get_position())
         pid_x = PID(0.5, 0.0, 0.1)
