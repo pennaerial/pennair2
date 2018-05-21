@@ -2,8 +2,8 @@
 # Fill copyright notice at github.com/pennaerial/pennair2/NOTICE
 
 import rospy
-from launch import launch, Node
-from launch import LaunchFile
+from pennair2.launch import launch, Node
+from pennair2.launch import LaunchFile
 
 
 class LocalizationNode(Node):
