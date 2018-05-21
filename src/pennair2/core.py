@@ -98,6 +98,15 @@ class UAV(object):
             p = self.get_pose(utm, fmt="pose")
             return (p.pose.position.x, p.pose.position.y, p.pose.position.z)
 
+    def get_position(self, utm=False):
+        if utm:
+            pose_covariance = self.autopilot.global_local
+            pose_stamped = PoseStamped(pose_covariance.header, pose_covariance.pose.pose)
+            return conversions.to_numpy(pose_stamped), pose_stamped.header.frame_id
+        else:
+            pose_stamped = self.autopilot.local_pose
+            return to_numpy(pose_stamped), pose_stamped.header.frame_id
+
     def set_position(self, value, frame_id="map", heading=None):
         """
 
