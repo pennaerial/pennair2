@@ -222,7 +222,7 @@ class Multirotor(UAV):
     def hover(self):
         self.set_position(self.get_pose())
 
-    def takeoff(self, speed=1, target_height=10):
+    def takeoff(self, speed=0.5, target_height=10):
         # type: (float, float) -> None
         rospy.loginfo("Waiting for arm.")
         self.wait_for(lambda: self.is_armed)
