@@ -277,5 +277,5 @@ class Multirotor(UAV):
         """
         UAV.set_position(self, position, frame_id, heading)
         rate = rospy.Rate(self.frequency)
-        while self.distance_to_target() > margin:
+        while blocking and self.distance_to_target() > margin:
             rate.sleep()
