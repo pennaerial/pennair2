@@ -49,7 +49,7 @@ class LocalizationNode(Node):
              False, False, False,
              True, True, True,
              True, True, True]
-        self.add_source("imu0", mavros_prefix+"/imu/data", imu_matrix)
+        self.add_source("imu0", mavros_prefix + "/imu/data", imu_matrix)
 
         if gps:
             odom_matrix = \
@@ -85,3 +85,18 @@ class NavstatTransformNode(Node):
         # type: (str, str) -> None
         self.add_remap("/imu/data", imu_topic)
         self.add_remap("/gps/fix", gps_topic)
+
+
+def launch_mavros_localization(package, mavros_prefix):
+    # type: (str, str) -> None
+    lf = LaunchFile()
+    ln1 = LocalizationNode("localization_odom", ukf=False, map_is_world=False)
+    ln1.add_mavros(mavros_prefix, False)
+    lf.add_node(ln1)
+    ln2 = LocalizationNode("localization_map", ukf=False, map_is_world=True)
+    ln2.add_mavros(mavros_prefix, True)
+    lf.add_node(ln2)
+    ntn = NavstatTransformNode("navstat_transform", ln2, mavros_prefix, True)
+    lf.add_node(ntn)
+    lf.write(package, "localization.launch")
+    launch(package, "localization.launch")
