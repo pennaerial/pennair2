@@ -104,7 +104,7 @@ class UAV(object):
 
         :param value: The desired position setpoint, only yaw component of orientation is used. Can be of type
             PoseStamped, Pose, Point, or an indexable object with 3 integer elements (list, tuple, numpy array etc.)
-        :type value: PoseStamped | Pose | Point | list[int,int,int] | (int,int,int)
+        :type value: PoseStamped | Pose | Point | list[int,int,int] | (int,int,int) | np.ndarray
         :param frame_id: The name of the frame to use for the message.
             Will only be applied if value is not already PoseStamped.
         :type frame_id: str
@@ -242,8 +242,7 @@ class Multirotor(UAV):
         self.set_position(position)
         self._vertical_pid(lambda: self.is_armed, speed=-abs(speed))
 
-
-    def _vertical_pid(self, condition, p=5.0, i=0.0,  d=1.0, speed=0.0, frequency=None):
+    def _vertical_pid(self, condition, p=5.0, i=0.0, d=1.0, speed=0.0, frequency=None):
         if frequency is None:
             frequency = self.frequency
         location = conversions.to_numpy(self.get_pose())
