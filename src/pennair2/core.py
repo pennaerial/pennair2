@@ -127,17 +127,10 @@ class UAV(object):
     def transform_pose(self, pose, target, timeout=1.0):
         # type: (PoseStamped, str, float) -> PoseStamped | None
         try:
-            transform = self.tf_buffer.lookup_transform(
-                target,
-                pose.header.frame_id,
-                rospy.Time.now(),
-                rospy.Duration.from_sec(timeout)
-            )
-            pose = tf2_geometry_msgs.do_transform_pose(pose, transform)
+            return self.tf_buffer.transform(pose, target, rospy.Duration.from_sec(timeout))
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
             rospy.logerr("Transforming setpoint failed: " + str(e))
             return None
-        return pose
 
     def get_twist(self):
         return self.autopilot.local_twist
