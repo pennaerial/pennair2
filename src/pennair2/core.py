@@ -139,8 +139,11 @@ class UAV(object):
             return None
         return pose
 
-    def get_velocity(self):
+    def get_twist(self):
         return self.autopilot.local_twist
+
+    def get_velocity(self):
+        return conversions.to_numpy(self.get_twist().twist.linear)
 
     def set_velocity(self, value, frame_id=None):
         if isinstance(value, TwistStamped):
