@@ -20,43 +20,40 @@ def shift_coord(lat, lon, dlat, dlon):
 def get_coord(lat, lon, x_pixel, y_pixel, pic_width, pic_height, hor_fov, ver_fov, roll, pitch, yaw, altitude):
     """
     :param lat: latitude at time of picture taken in degrees
-    :type index: float
+    :type lat: float
 
     :param lon: longitude at time of picture taken in degrees
-    :type index: float
+    :type lon: float
 
     :param x_pixel: x coordinate of pixel of target
-    :type index: int
+    :type x_pixel: int
 
     :param y_pixel: y coordinate of pixel of target
-    :type index: int
+    :type y_pixel: int
 
     :param pic_width: width of picture in pixels
-    :type index: int
+    :type pic_width: int
 
     :param pic_height: height of picture in pixels
-    :type index: int
+    :type pic_height: int
 
     :param hor_fov: camera horizontal field of view in degrees
-    :type index: float
+    :type hor_fov: float
 
     :param ver_fov: camera vertical field of view in degrees
-    :type index: float
+    :type ver_fov: float
 
     :param roll: roll in radians
-    :type index: float
-
-    :param roll: roll in radians
-    :type index: float
+    :type roll: float
 
     :param pitch: pitch in radians
-    :type index: float
+    :type pitch: float
 
     :param yaw: yaw in radians
-    :type index: float
+    :type yaw: float
 
     :param altitude: altitude in kilometers
-    :type index: float
+    :type altitude: float
     """
     dx = displacement(x_pixel, pic_width, hor_fov, roll, altitude)
     dy = displacement(y_pixel, pic_height, ver_fov, -pitch, altitude)
