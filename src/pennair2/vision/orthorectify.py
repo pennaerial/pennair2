@@ -1,10 +1,27 @@
 import math
+from geometry_msgs.msg import Pose
+import numpy as np
+from tf import transformations
 
 #helper method to find one dimensional displacement
 def displacement(pixel_coord, pixel_length, FOV, camera_tilt, altitude):
     target_angle = pixel_coord / pixel_length * FOV - FOV / 2 + camera_tilt;
     return altitude * math.tan(target_angle)
 #print(displacement(1, 4, 0.927295,- math.pi / 4, 6))
+
+def qv_mult(q1, v1):
+    v1 = transformations.unit_vector(v1)
+    q2 = list(v1)
+    q2.append(0.0)
+    return transformations.quaternion_multiply(
+        transformations.quaternion_multiply(q1, q2),
+        transformations.quaternion_conjugate(q1))[:3]
+
+def relative_displacement(pose, x_pixel, y_pixel, img_width, img_height, hor_fox, ver_fov):
+    # type: (Pose) -> np.ndarray
+    direction = [0, 0, -1]
+    q = [pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w]
+    direction = qv_mult(q, direction)
 
 #find coordinates of location on a picture and returns them as a tuple
 def get_coord(x_drone, y_drone, x_pixel, y_pixel, pic_width, pic_height, hor_fov, ver_fov, roll, pitch, yaw, altitude):
