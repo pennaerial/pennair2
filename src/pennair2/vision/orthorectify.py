@@ -3,7 +3,6 @@ from geometry_msgs.msg import Pose
 import numpy as np
 from tf import transformations
 
-#print(displacement(1, 4, 0.927295,- math.pi / 4, 6))
 def qv_mult(q1, v1):
     v1 = transformations.unit_vector(v1)
     q2 = list(v1)
