@@ -57,4 +57,4 @@ def get_coord(pose, x_pixel, y_pixel, pic_width, pic_height, hor_fov, ver_fov):
     q_total = transformations.quaternion_multiply(q2, q1)
     direction = [0, 0, -1]
     (dx, dy, dz) = qv_mult(q_total, direction)
-    return pose.position.x + dx, pose.position.y + dy, pose.position.z
+    return dx, dy, 0
