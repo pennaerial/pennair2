@@ -61,8 +61,8 @@ def get_coord(pose, x_pixel, y_pixel, pic_width, pic_height, hor_fov, ver_fov):
     :param altitude: altitude in kilometers
     :type altitude: float
     """
-    roll = x_pixel/pic_width * hor_fov - hor_fov / 2
-    pitch = y_pixel / pic_height * ver_fov - ver_fov / 2
+    pitch = x_pixel/pic_width * hor_fov - hor_fov / 2
+    roll = y_pixel / pic_height * ver_fov - ver_fov / 2
     q1 = transformations.quaternion_from_euler(roll, pitch, 0)
     q2 = [pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w]
     q_total = transformations.quaternion_multiply(q2, q1)
@@ -72,4 +72,4 @@ def get_coord(pose, x_pixel, y_pixel, pic_width, pic_height, hor_fov, ver_fov):
     plane_point = [0, 0, 0]
     ray_point = [pose.position.x, pose.position.y, pose.position.z]
     (x, y, z) = LinePlaneCollision(plane_normal, plane_point, direction, ray_point)
-    return x, y, pose.position.z
+    return x, y, z
