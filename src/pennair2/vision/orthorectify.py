@@ -11,6 +11,17 @@ def qv_mult(q1, v1):
         transformations.quaternion_multiply(q1, q2),
         transformations.quaternion_conjugate(q1))[:3]
 
+def LinePlaneCollision(planeNormal, planePoint, rayDirection, rayPoint, epsilon=1e-6):
+
+    ndotu = planeNormal.dot(rayDirection)
+    if abs(ndotu) < epsilon:
+        raise RuntimeError("no intersection or line is within plane")
+
+    w = rayPoint - planePoint
+    si = -planeNormal.dot(w) / ndotu
+    Psi = w + si * rayDirection + planePoint
+    return Psi
+
 #find coordinates of location on a picture and returns them as a tuple
 def get_coord(pose, x_pixel, y_pixel, pic_width, pic_height, hor_fov, ver_fov):
     """
@@ -52,9 +63,13 @@ def get_coord(pose, x_pixel, y_pixel, pic_width, pic_height, hor_fov, ver_fov):
     """
     roll = x_pixel/pic_width * hor_fov - hor_fov / 2
     pitch = y_pixel / pic_height * ver_fov - ver_fov / 2
-    q1 = transformations.quaternion_from_euler(roll, pitch, 0, axes='srpy')
+    q1 = transformations.quaternion_from_euler(roll, pitch, 0)
     q2 = [pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w]
     q_total = transformations.quaternion_multiply(q2, q1)
-    direction = [0, 0, -1]
-    (dx, dy, dz) = qv_mult(q_total, direction)
-    return dx, dy, 0
+    down = [0, 0, -1]
+    direction = qv_mult(q_total, direction)
+    plane_normal = [0, 0, 1]
+    plane_point = [0, 0, 0]
+    ray_point = [pose.position.x, pose.position.y, pose.position.z]
+    (x, y, z) = LinePlaneCollision(plane_normal, plane_point, direction, ray_point)
+    return x, y, pose.position.z
