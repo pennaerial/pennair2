@@ -61,8 +61,8 @@ def get_coord(pose, x_pixel, y_pixel, pic_width, pic_height, hor_fov, ver_fov):
     :param altitude: altitude in kilometers
     :type altitude: float
     """
-    roll = x_pixel/pic_width * hor_fov - hor_fov / 2
-    pitch = y_pixel / pic_height * ver_fov - ver_fov / 2
+    roll = hor_fov / 2 - x_pixel/pic_width * hor_fov
+    pitch = ver_fov / 2 - y_pixel / pic_height * ver_fov 
     q1 = transformations.quaternion_from_euler(roll, pitch, 0)
     q2 = [pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w]
     q_total = transformations.quaternion_multiply(q2, q1)
