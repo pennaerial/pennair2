@@ -4,7 +4,7 @@
 import numpy as np
 import rospy
 import utm
-from geometry_msgs.msg import Pose, Point, Vector3, PoseStamped, PointStamped
+from geometry_msgs.msg import Pose, Point, Vector3, PoseStamped, PointStamped, Point32
 from geometry_msgs.msg import PoseStamped
 from sensor_msgs.msg import NavSatFix
 from tf import transformations
@@ -78,7 +78,7 @@ def to_numpy(position):
     :param position:
     :type position: PoseStamped | PointStamped | Pose | Point | Vector3
     """
-    if isinstance(position, (Point, Vector3)):
+    if isinstance(position, (Point, Vector3, Point32)):
         return np.array([[position.x, position.y, position.z]]).T
     elif isinstance(position, Pose):
         return to_numpy(position.position)
