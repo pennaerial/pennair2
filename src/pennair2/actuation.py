@@ -14,6 +14,6 @@ class RCOverride:
     def set_pwm(self, val, channel):
         # type: (int, int) -> None
         msg = OverrideRCIn()  # type: OverrideRCIn
-        self.channels[channel] = val
-        msg.channels = channel
+        self.channels[channel-1] = val
+        msg.channels = self.channels
         self.actuator_pub.publish(msg)
