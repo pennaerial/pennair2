@@ -2,10 +2,9 @@
 # Fill copyright notice at github.com/pennaerial/pennair2/NOTICE
 
 import numpy as np
-
 import rospy
 import utm
-from geometry_msgs.msg import Pose, Point, Vector3, PoseStamped
+from geometry_msgs.msg import Pose, Point, Vector3, PoseStamped, PointStamped, Point32
 from geometry_msgs.msg import PoseStamped
 from sensor_msgs.msg import NavSatFix
 from tf import transformations
@@ -77,14 +76,16 @@ def to_numpy(position):
     """
     Create a numpy array (as a column vector) representation of a geometry_msgs position.
     :param position:
-    :type position: PoseStamped | Pose | Point | Vector3
+    :type position: PoseStamped | PointStamped | Pose | Point | Vector3
     """
-    if isinstance(position, (Point, Vector3)):
+    if isinstance(position, (Point, Vector3, Point32)):
         return np.array([[position.x, position.y, position.z]]).T
-    if isinstance(position, Pose):
+    elif isinstance(position, Pose):
         return to_numpy(position.position)
-    if isinstance(position, PoseStamped):
+    elif isinstance(position, PoseStamped):
         return to_numpy(position.pose.position)
+    elif isinstance(position, PointStamped):
+        return to_numpy(position.point)
 
 
 def to_pose_stamped(value, frame_id=None, heading=None):
@@ -92,7 +93,7 @@ def to_pose_stamped(value, frame_id=None, heading=None):
 
     :param value: The desired position setpoint, only yaw component of orientation is used. Can be of type
         PoseStamped, Pose, Point, or an indexable object with 3 integer elements (list, tuple, numpy array etc.)
-    :type value: PoseStamped | Pose | Point | list[int,int,int] | (int,int,int)
+    :type value: PoseStamped | Pose | Point | list[int,int,int] | (int,int,int) | np.ndarray
     :param frame_id: The name of the frame to use for the message. **Will not override frame_id of PoseStamped**.
     :type frame_id: str
     :param heading: Your desired heading in **radians**. This is the rotation around the **z-axis**.
@@ -107,6 +108,11 @@ def to_pose_stamped(value, frame_id=None, heading=None):
         else:
             if isinstance(value, Point):
                 msg.pose.position = value
+            elif isinstance(value, np.ndarray):
+                value = value.reshape((3, 1))
+                msg.pose.position.x = value[0, 0]
+                msg.pose.position.y = value[1, 0]
+                msg.pose.position.z = value[2, 0]
             else:
                 msg.pose.position.x = value[0]
                 msg.pose.position.y = value[1]
