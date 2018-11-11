@@ -4,6 +4,14 @@ pennair2.navigation package
 Submodules
 ----------
 
+pennair2.navigation.localization module
+---------------------------------------
+
+.. automodule:: pennair2.navigation.localization
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 pennair2.navigation.waypoint module
 -----------------------------------
 

@@ -1,8 +1,24 @@
 pennair2 package
 ================
 
+Subpackages
+-----------
+
+.. toctree::
+
+    pennair2.navigation
+    pennair2.vision
+
 Submodules
 ----------
+
+pennair2.PID module
+-------------------
+
+.. automodule:: pennair2.PID
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 pennair2.actuation module
 -------------------------
@@ -16,6 +32,14 @@ pennair2.autopilot module
 -------------------------
 
 .. automodule:: pennair2.autopilot
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pennair2.controller module
+--------------------------
+
+.. automodule:: pennair2.controller
     :members:
     :undoc-members:
     :show-inheritance:
@@ -36,18 +60,18 @@ pennair2.core module
     :undoc-members:
     :show-inheritance:
 
-pennair2.launch module
-----------------------
+pennair2.gui module
+-------------------
 
-.. automodule:: pennair2.launch
+.. automodule:: pennair2.gui
     :members:
     :undoc-members:
     :show-inheritance:
 
-pennair2.localization module
-----------------------------
+pennair2.launch module
+----------------------
 
-.. automodule:: pennair2.localization
+.. automodule:: pennair2.launch
     :members:
     :undoc-members:
     :show-inheritance:
@@ -64,14 +88,6 @@ pennair2.swarm module
 ---------------------
 
 .. automodule:: pennair2.swarm
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-pennair2.utm module
--------------------
-
-.. automodule:: pennair2.utm
     :members:
     :undoc-members:
     :show-inheritance:

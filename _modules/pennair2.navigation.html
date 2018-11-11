@@ -24,26 +24,19 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="pennair2  documentation" href="../index.html"/>
-        <link rel="prev" title="pennair2 package" href="pennair2.html"/> 
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pennair2.vision package" href="pennair2.vision.html" />
+    <link rel="prev" title="pennair2 package" href="pennair2.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -86,13 +79,40 @@
             
             
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="pennair2.html">pennair2 package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="pennair2.html">pennair2 package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="pennair2.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pennair2.navigation package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-pennair2.navigation.localization">pennair2.navigation.localization module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-pennair2.navigation.waypoint">pennair2.navigation.waypoint module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-pennair2.navigation">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pennair2.vision.html">pennair2.vision package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.PID">pennair2.PID module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.actuation">pennair2.actuation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.autopilot">pennair2.autopilot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.controller">pennair2.controller module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.conversions">pennair2.conversions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.core">pennair2.core module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#pennair2-gui-module">pennair2.gui module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.launch">pennair2.launch module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.search">pennair2.search module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.swarm">pennair2.swarm module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">pennair2.navigation package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pennair2.navigation.localization">pennair2.navigation.localization module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pennair2.navigation.waypoint">pennair2.navigation.waypoint module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pennair2.navigation">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="pennair2.vision.html">pennair2.vision package</a></li>
 </ul>
 
             
@@ -104,7 +124,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">pennair2</a>
@@ -112,9 +132,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -136,6 +157,8 @@
   <ul class="wy-breadcrumbs">
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="pennair2.html">pennair2 package</a> &raquo;</li>
         
       <li>pennair2.navigation package</li>
     
@@ -161,6 +184,41 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="module-pennair2.navigation.localization">
+<span id="pennair2-navigation-localization-module"></span><h2>pennair2.navigation.localization module<a class="headerlink" href="#module-pennair2.navigation.localization" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pennair2.navigation.localization.LocalizationNode">
+<em class="property">class </em><code class="descclassname">pennair2.navigation.localization.</code><code class="descname">LocalizationNode</code><span class="sig-paren">(</span><em>name</em>, <em>ukf=False</em>, <em>map_is_world=True</em>, <em>frame_prefix=''</em>, <em>publish_tf=True</em>, <em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.navigation.localization.LocalizationNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pennair2.html#pennair2.launch.Node" title="pennair2.launch.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">pennair2.launch.Node</span></code></a></p>
+<dl class="method">
+<dt id="pennair2.navigation.localization.LocalizationNode.add_mavros">
+<code class="descname">add_mavros</code><span class="sig-paren">(</span><em>mavros_prefix=''</em>, <em>gps=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.navigation.localization.LocalizationNode.add_mavros" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pennair2.navigation.localization.LocalizationNode.add_source">
+<code class="descname">add_source</code><span class="sig-paren">(</span><em>name</em>, <em>topic</em>, <em>matrix</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.navigation.localization.LocalizationNode.add_source" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pennair2.navigation.localization.NavstatTransformNode">
+<em class="property">class </em><code class="descclassname">pennair2.navigation.localization.</code><code class="descname">NavstatTransformNode</code><span class="sig-paren">(</span><em>name</em>, <em>localization_node_odometry</em>, <em>mavros_prefix=None</em>, <em>broadcast_transform=True</em>, <em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.navigation.localization.NavstatTransformNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="pennair2.html#pennair2.launch.Node" title="pennair2.launch.Node"><code class="xref py py-class docutils literal notranslate"><span class="pre">pennair2.launch.Node</span></code></a></p>
+<dl class="method">
+<dt id="pennair2.navigation.localization.NavstatTransformNode.specify_data">
+<code class="descname">specify_data</code><span class="sig-paren">(</span><em>imu_topic</em>, <em>gps_topic</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.navigation.localization.NavstatTransformNode.specify_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pennair2.navigation.localization.launch_mavros_localization">
+<code class="descclassname">pennair2.navigation.localization.</code><code class="descname">launch_mavros_localization</code><span class="sig-paren">(</span><em>package</em>, <em>mavros_prefix</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.navigation.localization.launch_mavros_localization" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
 <div class="section" id="module-pennair2.navigation.waypoint">
 <span id="pennair2-navigation-waypoint-module"></span><h2>pennair2.navigation.waypoint module<a class="headerlink" href="#module-pennair2.navigation.waypoint" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -173,7 +231,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>waypoint</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – waypoint to add</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>waypoint</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – waypoint to add</td>
 </tr>
 </tbody>
 </table>
@@ -186,7 +244,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – index to delete</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index to delete</td>
 </tr>
 </tbody>
 </table>
@@ -199,7 +257,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – index to delete</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – index to delete</td>
 </tr>
 </tbody>
 </table>
@@ -225,13 +283,13 @@
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pennair2.vision.html" class="btn btn-neutral float-right" title="pennair2.vision package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="pennair2.html" class="btn btn-neutral" title="pennair2 package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -243,11 +301,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Penn Aerial Robotics.
+        &copy; Copyright 2018, Penn Aerial Robotics
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -262,35 +320,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

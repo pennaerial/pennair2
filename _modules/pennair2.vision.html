@@ -1,0 +1,291 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pennair2.vision package &mdash; pennair2  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="pennair2.navigation package" href="pennair2.navigation.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pennair2
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="pennair2.html">pennair2 package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="pennair2.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pennair2.navigation.html">pennair2.navigation package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pennair2.vision package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-pennair2.vision.calibrate">pennair2.vision.calibrate module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-pennair2.vision.orthorectify">pennair2.vision.orthorectify module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-pennair2.vision">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.PID">pennair2.PID module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.actuation">pennair2.actuation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.autopilot">pennair2.autopilot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.controller">pennair2.controller module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.conversions">pennair2.conversions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.core">pennair2.core module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#pennair2-gui-module">pennair2.gui module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.launch">pennair2.launch module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.search">pennair2.search module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2.swarm">pennair2.swarm module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pennair2.html#module-pennair2">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pennair2.navigation.html">pennair2.navigation package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">pennair2.vision package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pennair2.vision.calibrate">pennair2.vision.calibrate module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pennair2.vision.orthorectify">pennair2.vision.orthorectify module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pennair2.vision">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pennair2</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="pennair2.html">pennair2 package</a> &raquo;</li>
+        
+      <li>pennair2.vision package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_modules/pennair2.vision.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pennair2-vision-package">
+<h1>pennair2.vision package<a class="headerlink" href="#pennair2-vision-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-pennair2.vision.calibrate">
+<span id="pennair2-vision-calibrate-module"></span><h2>pennair2.vision.calibrate module<a class="headerlink" href="#module-pennair2.vision.calibrate" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-pennair2.vision.orthorectify">
+<span id="pennair2-vision-orthorectify-module"></span><h2>pennair2.vision.orthorectify module<a class="headerlink" href="#module-pennair2.vision.orthorectify" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="pennair2.vision.orthorectify.LinePlaneCollision">
+<code class="descclassname">pennair2.vision.orthorectify.</code><code class="descname">LinePlaneCollision</code><span class="sig-paren">(</span><em>planeNormal</em>, <em>planePoint</em>, <em>rayDirection</em>, <em>rayPoint</em>, <em>epsilon=1e-06</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.vision.orthorectify.LinePlaneCollision" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pennair2.vision.orthorectify.get_coord">
+<code class="descclassname">pennair2.vision.orthorectify.</code><code class="descname">get_coord</code><span class="sig-paren">(</span><em>pose</em>, <em>x_pixel</em>, <em>y_pixel</em>, <em>pic_width</em>, <em>pic_height</em>, <em>hor_fov</em>, <em>ver_fov</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.vision.orthorectify.get_coord" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x_drone</strong> – x-position of drone</li>
+<li><strong>y_drone</strong> – y-position of drone</li>
+<li><strong>x_pixel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – x coordinate of pixel of target</li>
+<li><strong>y_pixel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – y coordinate of pixel of target</li>
+<li><strong>pic_width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – width of picture in pixels</li>
+<li><strong>pic_height</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – height of picture in pixels</li>
+<li><strong>hor_fov</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – camera horizontal field of view in degrees</li>
+<li><strong>ver_fov</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – camera vertical field of view in degrees</li>
+<li><strong>roll</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – roll in radians</li>
+<li><strong>pitch</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – pitch in radians</li>
+<li><strong>yaw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – yaw in radians</li>
+<li><strong>altitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – altitude in kilometers</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pennair2.vision.orthorectify.qv_mult">
+<code class="descclassname">pennair2.vision.orthorectify.</code><code class="descname">qv_mult</code><span class="sig-paren">(</span><em>q1</em>, <em>v1</em><span class="sig-paren">)</span><a class="headerlink" href="#pennair2.vision.orthorectify.qv_mult" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-pennair2.vision">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pennair2.vision" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="pennair2.navigation.html" class="btn btn-neutral" title="pennair2.navigation package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Penn Aerial Robotics
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

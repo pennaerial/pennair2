@@ -1,0 +1,30 @@
+pennair2.vision package
+=======================
+
+Submodules
+----------
+
+pennair2.vision.calibrate module
+--------------------------------
+
+.. automodule:: pennair2.vision.calibrate
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pennair2.vision.orthorectify module
+-----------------------------------
+
+.. automodule:: pennair2.vision.orthorectify
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: pennair2.vision
+    :members:
+    :undoc-members:
+    :show-inheritance:
