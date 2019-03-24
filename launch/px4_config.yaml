@@ -45,18 +45,19 @@ cmd:
 # global_position
 global_position:
   frame_id: "map"             # origin frame
-  child_frame_id: "fcu" # body-fixed frame
+  child_frame_id: "base_link" # body-fixed frame
   rot_covariance: 99999.0   # covariance for attitude?
+  gps_uere: 1.0             # User Equivalent Range Error (UERE) of GPS sensor (m)
   use_relative_alt: true    # use relative altitude for local coordinates
   tf:
     send: false               # send TF?
     frame_id: "map"  # TF frame_id
     global_frame_id: "earth"  # TF earth frame_id
-    child_frame_id: "fcu" # TF child_frame_id
+    child_frame_id: "base_link" # TF child_frame_id
 
 # imu_pub
 imu:
-  frame_id: "fcu"
+  frame_id: "base_link"
   # need find actual values
   linear_acceleration_stdev: 0.0003
   angular_velocity_stdev: !degrees 0.02
@@ -67,10 +68,10 @@ imu:
 local_position:
   frame_id: "map"
   tf:
-    send: false
+    send: true
     frame_id: "map"
-    child_frame_id: "fcu"
-    send_fcu: false
+    child_frame_id: "base_link"
+    send_fcu: true
 
 # param
 # None, used for FCU params
@@ -96,6 +97,11 @@ setpoint_attitude:
     frame_id: "map"
     child_frame_id: "target_attitude"
     rate_limit: 50.0
+
+setpoint_raw:
+  thrust_scaling: 1.0       # used in setpoint_raw attitude callback.
+  # Note: PX4 expects normalized thrust values between 0 and 1, which means that
+  # the scaling needs to be unitary and the inputs should be 0..1 as well.
 
 # setpoint_position
 setpoint_position:
@@ -188,9 +194,19 @@ mocap:
 
 # odom
 odometry:
-  frame_tf:
-    desired_frame: "ned"
-  estimator_type: 3 # check enum MAV_ESTIMATOR_TYPE in <http://mavlink.org/messages/common>
+  in:
+    frame_id: "odom"
+    child_frame_id: "base_link"
+    frame_tf:
+      local_frame: "local_origin_ned"
+      body_frame_orientation: "flu"
+  out:
+    frame_tf:
+      # available: check MAV_FRAME odometry local frames in
+      # https://mavlink.io/en/messages/common.html
+      local_frame: "vision_ned"
+      # available: ned, frd or flu (though only the tf to frd is supported)
+      body_frame_orientation: "frd"
 
 # px4flow
 px4flow:
@@ -209,10 +225,27 @@ vision_pose:
 
 # vision_speed_estimate
 vision_speed:
-  listen_twist: false
+  listen_twist: true    # enable listen to twist topic, else listen to vec3d topic
+  twist_cov: true       # enable listen to twist with covariance topic
 
 # vibration
 vibration:
-  frame_id: "fcu"
+  frame_id: "base_link"
+
+# wheel_odometry
+wheel_odometry:
+  count: 2           # number of wheels to compute odometry
+  use_rpm: false     # use wheel's RPM instead of cumulative distance to compute odometry
+  wheel0: {x: 0.0, y: -0.15, radius: 0.05} # x-, y-offset (m,NED) and radius (m)
+  wheel1: {x: 0.0, y:  0.15, radius: 0.05} # x-, y-offset (m,NED) and radius (m)
+  send_raw: true              # send wheel's RPM and cumulative distance (~/wheel_odometry/rpm, ~/wheel_odometry/distance)
+  send_twist: false           # send geometry_msgs/TwistWithCovarianceStamped instead of nav_msgs/Odometry
+  frame_id: "map"             # origin frame
+  child_frame_id: "base_link" # body-fixed frame
+  vel_error: 0.1              # wheel velocity measurement error 1-std (m/s)
+  tf:
+    send: true
+    frame_id: "map"
+    child_frame_id: "base_link"
 
 # vim:set ts=2 sw=2 et:
