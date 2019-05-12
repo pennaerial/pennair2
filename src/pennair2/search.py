@@ -48,7 +48,7 @@ class BoxSearch(Search):
             print("WARN: BoxSearch -> no velocity setpoint")
             return
         x, y, _ = self.velocity
-        cx, cy, cz = self.uav.get_pose(fmt="tuple")
+        cx, cy, cz = self.uav.get_position()
         if x == 0:
             self.pidxy.update(cx)
             x = self.pidxy.output
