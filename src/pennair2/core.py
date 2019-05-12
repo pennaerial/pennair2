@@ -242,7 +242,7 @@ class Multirotor(UAV):
         self.set_position(position)
         self._vertical_pid(lambda: self.is_armed, speed=-abs(speed))
 
-    def _vertical_pid(self, condition, p=5.0, i=0.0, d=1.0, speed=0.0, frequency=None):
+    def _vertical_pid(self, condition, p=5.0, i=0.5, d=1.0, speed=0.0, frequency=None):
         if frequency is None:
             frequency = self.frequency
         location = conversions.to_numpy(self.get_pose())
