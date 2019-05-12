@@ -264,7 +264,7 @@ class Multirotor(UAV):
         """Tells multirotor to fly to maintain given position.
 
         :param position: The setpoint position.
-        :type position: PoseStamped | Pose | Point | list[int,int,int] | (int,int,int) | np.ndarray
+        :type position: PoseStamped | Pose | Point | list[float,float,float] | (float,float,float) | np.ndarray
         :param frame_id: The frame relative to which the setpoint is set.
         :type frame_id: str
         :param heading: The heading to maintain.
