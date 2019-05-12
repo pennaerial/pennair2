@@ -48,7 +48,7 @@ class BoxSearch(Search):
             print("WARN: BoxSearch -> no velocity setpoint")
             return
         x, y, _ = self.velocity
-        cx, cy, cz = self.uav.get_pose(fmt="tuple")
+        cx, cy, cz = self.uav.get_position()
         if x == 0:
             self.pidxy.update(cx)
             x = self.pidxy.output
@@ -62,7 +62,7 @@ class BoxSearch(Search):
         if self.last_pose is None: 
             return True
         
-        x, y, _ = self.uav.get_pose(fmt="tuple")
+        x, y, _ = self.uav.get_position()
         if self.last_increment_dim == "+x":
             return x > self.last_pose.pose.position.x
         elif self.last_increment_dim == "-x":
