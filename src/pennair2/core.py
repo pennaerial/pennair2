@@ -96,7 +96,7 @@ class UAV(object):
             if pose_covariance is None:
                 return None
             pose_stamped = PoseStamped(pose_covariance.header, pose_covariance.pose.pose)
-            return conversions.to_numpy(pose_stamped), pose_stamped.header.frame_id
+            return conversions.to_numpy(pose_stamped)
         else:
             pose_stamped = self.autopilot.local_pose
             if pose_stamped is None:
