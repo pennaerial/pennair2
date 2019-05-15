@@ -22,7 +22,7 @@ class UAV(object):
         VELOCITY = 2
         ACCELERATION = 3
 
-    def __init__(self, autopilot, frequency=30):
+    def __init__(self, autopilot, frequency=30, use_gps=True):
         # type: (Autopilot, float) -> None
         """
 
@@ -44,6 +44,7 @@ class UAV(object):
         self._setpoint_vel = None  # type: TwistStamped
         self._setpoint_mode = None  # type: UAV.SetpointMode
         self._setpoint_heading = None  # type: int
+        self.use_gps = use_gps  # type: bool
 
         # setpoint/control stream loop, must publish setpoints to change into OFFBOARD
         self.loop_timer = rospy.Timer(rospy.Duration.from_sec(1.0 / frequency), self.__control_loop)
@@ -81,17 +82,16 @@ class UAV(object):
     def get_relative_altitude(self):
         return self.autopilot.relative_altitude
 
-    def get_pose(self, utm=False, fmt="pose"):
-        # type: (bool, str) -> PoseStamped
-        if fmt is "pose":
-            if utm:
-                pose_covariance = self.autopilot.global_local
-                return PoseStamped(pose_covariance.header, pose_covariance.pose.pose)
-            else:
-                return self.autopilot.local_pose
+    def get_pose(self):
+        # type: () -> PoseStamped
+        if self.use_gps:
+            pose_covariance = self.autopilot.global_local
+            return PoseStamped(pose_covariance.header, pose_covariance.pose.pose)
+        else:
+            return self.autopilot.local_pose
 
-    def get_position(self, utm=False):
-        if utm:
+    def get_position(self):
+        if self.use_gps:
             pose_covariance = self.autopilot.global_local
             if pose_covariance is None:
                 return None
