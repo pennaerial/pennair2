@@ -48,6 +48,7 @@ class UAV(object):
 
         # setpoint/control stream loop, must publish setpoints to change into OFFBOARD
         self.loop_timer = rospy.Timer(rospy.Duration.from_sec(1.0 / frequency), self.__control_loop)
+        rospy.sleep(3.0)
 
     def __control_loop(self, event):
         if not rospy.is_shutdown():
