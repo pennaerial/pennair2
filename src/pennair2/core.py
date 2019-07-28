@@ -211,13 +211,13 @@ class UAV(object):
 
 
 class Multirotor(UAV):
-    def __init__(self, autopilot, frequency=30):
+    def __init__(self, autopilot, frequency=30, use_gps=True):
         """
 
         :param autopilot: The autopilot object to use.
         :type autopilot: Autopilot
         """
-        UAV.__init__(self, autopilot, frequency=frequency)
+        UAV.__init__(self, autopilot, frequency=frequency, use_gps=use_gps)
         self.home = self.get_pose()
 
     def hover(self):
