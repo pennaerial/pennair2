@@ -117,8 +117,8 @@ class UAV(object):
         :param frame_id: The name of the frame to use for the message.
             Will only be applied if value is not already PoseStamped.
         :type frame_id: str
-        :param heading: Your desired heading.
-        :type heading: int
+        :param heading: Your desired heading in **radians**.
+        :type heading: float
         """
         if heading is None:
             if self._setpoint_heading is not None:
@@ -272,8 +272,8 @@ class Multirotor(UAV):
         :type position: PoseStamped | Pose | Point | list[float,float,float] | (float,float,float) | np.ndarray
         :param frame_id: The frame relative to which the setpoint is set.
         :type frame_id: str
-        :param heading: The heading to maintain.
-        :type heading: int
+        :param heading: The heading to maintain in **radians**.
+        :type heading: float
         :param blocking: Weather or not to block the thread until setpoint reached.
         :type blocking: bool
         :param margin: The setpoint margin. Only matters if blocking is true.
