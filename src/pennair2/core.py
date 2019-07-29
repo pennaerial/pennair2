@@ -14,7 +14,7 @@ from enum import Enum
 from pennair2 import conversions
 from .conversions import to_numpy, to_pose_stamped
 from pennair2.PID import PID
-
+from tf import transformations
 
 class UAV(object):
     class SetpointMode(Enum):
@@ -78,7 +78,11 @@ class UAV(object):
         return self.autopilot.global_global
 
     def get_heading(self):
-        return math.pi * self.autopilot.heading / 180
+        if self.use_gps:
+            return math.pi * self.autopilot.heading / 180
+        else:
+            q = self.get_pose().pose.orientation
+            return transformations.euler_from_quaternion([q.w, q.x, q.y, q.z], 'sxyz')[2]
 
     def get_relative_altitude(self):
         return self.autopilot.relative_altitude
