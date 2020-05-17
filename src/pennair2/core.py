@@ -38,7 +38,6 @@ class UAV(object):
 
         rospy.loginfo("Waiting for autopilot connection.")
         self.wait_for(self.autopilot.is_connected)
-        rospy.sleep(1)
         rospy.loginfo("Connected.")
 
         self._setpoint_pos = None  # type: PoseStamped
@@ -223,6 +222,7 @@ class Multirotor(UAV):
         :type autopilot: Autopilot
         """
         UAV.__init__(self, autopilot, frequency=frequency, use_gps=use_gps)
+        self.wait_for(lambda: self.get_pose() is not None)
         self.home = self.get_pose()
 
     def hover(self):
