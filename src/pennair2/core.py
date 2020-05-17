@@ -38,6 +38,7 @@ class UAV(object):
 
         rospy.loginfo("Waiting for autopilot connection.")
         self.wait_for(self.autopilot.is_connected)
+        self.wait_for(self.autopilot.variables_initialized)
         rospy.loginfo("Connected.")
 
         self._setpoint_pos = None  # type: PoseStamped
@@ -62,16 +63,30 @@ class UAV(object):
         if isinstance(self.autopilot, Mavros):
             return self.autopilot.state.armed
 
+    @is_armed.setter
+    def is_armed(self, value):
+        if isinstance(self.autopilot, Mavros):
+            self.autopilot.set_arm(value)
+
     @property
     def is_offboard(self):
         if isinstance(self.autopilot, Mavros):
             return self.autopilot.state.mode == "OFFBOARD"
 
+    @is_offboard.setter
+    def is_offboard(self, value):
+        if isinstance(self.autopilot, Mavros):
+            if not value:
+                # TODO: implement setting offboard to false
+                raise ValueError("Setting offboard to false not implemented.")
+            else:
+                self.autopilot.set_offboard_mode()
+
     def wait(self, seconds, rate=30):
         rospy.sleep(seconds / rate)
 
     def wait_for(self, fun, rate=30, wait_val=True):
-        while not fun() == wait_val:
+        while not rospy.is_shutdown() and not fun() == wait_val:
             rospy.sleep(1.0 / rate)
 
     def get_gps(self):
@@ -222,7 +237,6 @@ class Multirotor(UAV):
         :type autopilot: Autopilot
         """
         UAV.__init__(self, autopilot, frequency=frequency, use_gps=use_gps)
-        self.wait_for(lambda: self.get_pose() is not None)
         self.home = self.get_pose()
 
     def hover(self):
@@ -233,6 +247,8 @@ class Multirotor(UAV):
         rospy.loginfo("Waiting for arm.")
         self.wait_for(lambda: self.is_armed)
         self.set_velocity([0, 0, 0])
+        rospy.sleep(0.5)
+        self.is_offboard = True
         rospy.loginfo("Waiting for offboard.")
         self.wait_for(lambda: self.is_offboard)
         rospy.loginfo("Takeoff!")

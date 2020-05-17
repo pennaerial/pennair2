@@ -8,11 +8,12 @@ from geometry_msgs.msg import PoseStamped, TwistStamped, PoseWithCovarianceStamp
 from sensor_msgs.msg import NavSatFix, Imu, BatteryState
 from std_msgs.msg import Float64
 from mavros_msgs.msg import State
-from mavros_msgs.srv import CommandLong, CommandInt, CommandLongRequest, CommandIntRequest
+from mavros_msgs.srv import CommandLong, CommandInt, CommandLongRequest, CommandIntRequest, SetMode, CommandBool
 from roslaunch.scriptapi import ROSLaunch
 from roslaunch.core import Node
 from nav_msgs.msg import Odometry
 from pennair2.launch import launch
+
 
 class Autopilot:
     __metaclass__ = ABCMeta
@@ -33,6 +34,21 @@ class Autopilot:
         self._local_pose = None  # type: PoseStamped
         self._local_twist = None  # type: TwistStamped
         # endregion
+
+    def variables_initialized(self):
+        # TODO: make sure null checks are done for all variables
+        return (self._global_global is not None and
+                self._global_local is not None and
+                self._relative_altitude is not None and
+                self._heading is not None and
+                # self._global_vel_raw is not None and
+                # self._gps_raw is not None and
+                # self._gps_twist_raw is not None and
+                self._imu_data is not None and
+                self._imu_data_raw is not None and
+                self._local_pose is not None
+                # self._local_twist is not None
+                )
 
     # global_positionW
     @property
@@ -237,7 +253,8 @@ class Mavros(Autopilot):
 
         # region Publishers
         # attitude setpoints
-        self.ang_velocity_pub = rospy.Publisher(mavros_prefix + "/setpoint_attitude/cmd_vel", TwistStamped, queue_size=1)
+        self.ang_velocity_pub = rospy.Publisher(mavros_prefix + "/setpoint_attitude/cmd_vel", TwistStamped,
+                                                queue_size=1)
         self.attitude_pub = rospy.Publisher(mavros_prefix + "/setpoint_attitude/attitude", PoseStamped, queue_size=1)
         self.throttle_pub = rospy.Publisher(mavros_prefix + "/setpoint_attitude/att_throttle", Float64, queue_size=1)
 
@@ -306,6 +323,22 @@ class Mavros(Autopilot):
         msg.twist = val.twist
         self.velocity_pub.publish(msg)
 
+    def set_offboard_mode(self):
+        rospy.wait_for_service('/mavros/set_mode')
+        try:
+            flightModeService = rospy.ServiceProxy('/mavros/set_mode', SetMode)
+            isModeChanged = flightModeService(custom_mode='OFFBOARD')
+        except rospy.ServiceException as e:
+            print("service set_mode call failed: %s. OFFBOARD Mode could not be set. Check that GPS is enabled" % e)
+
+    def set_arm(self, val):
+        rospy.wait_for_service('/mavros/cmd/arming')
+        try:
+            armService = rospy.ServiceProxy('/mavros/cmd/arming', CommandBool)
+            armService(val)
+        except rospy.ServiceException as e:
+            print("Service arm call failed: %s" % e)
+
     def launch_node(self, fcu_url="udp://:14540@127.0.0.1:14557", gcs_url="udp://@10.42.0.1", **kwargs):
         """
         Launch a mavros node corresponding to the appropriate
@@ -317,5 +350,5 @@ class Mavros(Autopilot):
 
         """
         pass
-        #TODO: make work after update to ROS Lunar
-        #launch("pennair2", "mavros.launch", name=self.mavros_prefix, fcu_url=fcu_url, gcs_url=gcs_url, **kwargs)
+        # TODO: make work after update to ROS Lunar
+        # launch("pennair2", "mavros.launch", name=self.mavros_prefix, fcu_url=fcu_url, gcs_url=gcs_url, **kwargs)
