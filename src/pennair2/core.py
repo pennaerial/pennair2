@@ -38,6 +38,7 @@ class UAV(object):
 
         rospy.loginfo("Waiting for autopilot connection.")
         self.wait_for(self.autopilot.is_connected)
+        rospy.sleep(1)
         rospy.loginfo("Connected.")
 
         self._setpoint_pos = None  # type: PoseStamped
