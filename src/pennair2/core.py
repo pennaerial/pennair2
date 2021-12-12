@@ -23,7 +23,7 @@ class UAV(object):
         ACCELERATION = 3
 
     def __init__(self, autopilot, frequency=30, use_gps=True):
-        # type: (Autopilot, float) -> None
+        # type: (Autopilot, float, bool) -> None
         """
 
         :param autopilot: An autopilot object to use.

@@ -1,13 +1,14 @@
 # Copyright (C) 2018  Penn Aerial Robotics
 # Fill copyright notice at github.com/pennaerial/pennair2/NOTICE
 
+from types import NoneType
 import rospy
 from abc import ABCMeta, abstractmethod
 from copy import deepcopy
 from geometry_msgs.msg import PoseStamped, TwistStamped, PoseWithCovarianceStamped, Vector3Stamped
 from sensor_msgs.msg import NavSatFix, Imu, BatteryState
 from std_msgs.msg import Float64
-from mavros_msgs.msg import State
+from mavros_msgs.msg import State, WaypointList, Waypoint, WaypointClear
 from mavros_msgs.srv import CommandLong, CommandInt, CommandLongRequest, CommandIntRequest, SetMode, CommandBool
 from roslaunch.scriptapi import ROSLaunch
 from roslaunch.core import Node
@@ -247,6 +248,8 @@ class Mavros(Autopilot):
         rospy.Subscriber(mavros_prefix + "/local_position/pose", PoseStamped, local_pose_callback)
         rospy.Subscriber(mavros_prefix + "/local_position/velocity", TwistStamped, local_twist_callback)
 
+        rospy.Subscriber(mavros_prefix + "/mission/waypoints", WaypointList, waypoints_callback)
+
         rospy.Subscriber(mavros_prefix + "/state", State, state_callback)
         rospy.Subscriber(mavros_prefix + "/battery", BatteryState, battery_callback)
         # endregion
@@ -264,6 +267,9 @@ class Mavros(Autopilot):
 
         self.command_long_srv = rospy.ServiceProxy(mavros_prefix + "/cmd/Command", CommandLong)
         self.command_int_srv = rospy.ServiceProxy(mavros_prefix + "/cmd/CommandInt", CommandInt)
+
+        self.waypoints_clear = rospy.ServiceProxy(mavros_prefix + "/mission/clear", WaypointClear)
+        self.waypoints_srv = rospy.ServiceProxy(mavros_prefix + "/mission/push", WaypointList)
         # endregion
 
     def is_connected(self):
@@ -323,6 +329,37 @@ class Mavros(Autopilot):
         msg.twist = val.twist
         self.velocity_pub.publish(msg)
 
+    def set_mission_path(self, val):
+        rospy.wait_for_service('/mavros/mission/push')
+        try:
+            success = self.waypoints_srv(waypoints=val)
+        except rospy.ServiceException as e:
+            print("failed to update waypoint table")
+
+    def clear_mission_path(self):
+        rospy.wait_for_service('/mavros/mission/clear')
+        try:
+            success = self.waypoints_clear()
+        except rospy.ServiceException as e:
+            print("failed to clear waypoint table")
+
+    #vtol takeoff and landing cmds (vtol takeoff: 84, vtol land: 85)
+    def takeoff(self, long, lat, alt):
+        rospy.wait_for_service('/mavros/cmd/command')
+        try:
+            takeoffService = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
+            successful = takeoffService(command=84, param2=1, param4=None, param5=long, param6=lat, param7=alt)
+        except rospy.ServiceException as e:
+            print("failed to send takeoff cmd" % e)
+
+    def landing(self, long, lat, alt):
+        rospy.wait_for_service('/mavros/cmd/command')
+        try:
+            takeoffService = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
+            successful = takeoffService(command=85, param1=0, param3=None, param4=None, param5=long, param6=lat, param7=None)
+        except rospy.ServiceException as e:
+            print("failed to send takeoff cmd" % e)
+
     def set_offboard_mode(self):
         rospy.wait_for_service('/mavros/set_mode')
         try:
@@ -330,6 +367,14 @@ class Mavros(Autopilot):
             isModeChanged = flightModeService(custom_mode='OFFBOARD')
         except rospy.ServiceException as e:
             print("service set_mode call failed: %s. OFFBOARD Mode could not be set. Check that GPS is enabled" % e)
+
+    def set_mission_mode(self):
+        rospy.wait_for_service('/mavros/set_mode')
+        try:
+            flightModeService = rospy.ServiceProxy('/mavros/set_mode', SetMode)
+            isModeChanged = flightModeService(custom_mode='AUTO.MISSION')
+        except rospy.ServiceException as e:
+            print("service set_mode call failed: %s. AUTO.MISSION Mode could not be set." % e)
 
     def set_arm(self, val):
         rospy.wait_for_service('/mavros/cmd/arming')
