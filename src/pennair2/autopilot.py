@@ -248,6 +248,7 @@ class Mavros(Autopilot):
         rospy.Subscriber(mavros_prefix + "/local_position/pose", PoseStamped, local_pose_callback)
         rospy.Subscriber(mavros_prefix + "/local_position/velocity", TwistStamped, local_twist_callback)
 
+        # waypoint channel for getting current waypoints, callback auto updates
         rospy.Subscriber(mavros_prefix + "/mission/waypoints", WaypointList, waypoints_callback)
 
         rospy.Subscriber(mavros_prefix + "/state", State, state_callback)
@@ -265,11 +266,15 @@ class Mavros(Autopilot):
         self.velocity_pub = rospy.Publisher(mavros_prefix + "/setpoint_velocity/cmd_vel", TwistStamped, queue_size=1)
         self.acceleration_pub = rospy.Publisher(mavros_prefix + "/setpoint_accel/accel", Vector3Stamped, queue_size=1)
 
-        self.command_long_srv = rospy.ServiceProxy(mavros_prefix + "/cmd/Command", CommandLong)
-        self.command_int_srv = rospy.ServiceProxy(mavros_prefix + "/cmd/CommandInt", CommandInt)
+        self.command_long_srv = rospy.ServiceProxy(mavros_prefix + "/cmd/command", CommandLong)
+        self.command_int_srv = rospy.ServiceProxy(mavros_prefix + "/cmd/command_int", CommandInt)
 
+        # mission mode waypoint services for px4 interaction
         self.waypoints_clear = rospy.ServiceProxy(mavros_prefix + "/mission/clear", WaypointClear)
         self.waypoints_srv = rospy.ServiceProxy(mavros_prefix + "/mission/push", WaypointList)
+
+        # setmode service
+        self.flightModeService = rospy.ServiceProxy('/mavros/set_mode', SetMode)
         # endregion
 
     def is_connected(self):
@@ -329,13 +334,33 @@ class Mavros(Autopilot):
         msg.twist = val.twist
         self.velocity_pub.publish(msg)
 
-    def set_mission_path(self, val):
+    # params: list of (acceptRadius, passRadius, lat, long, rel_alt(start is 0)) waypoints to push as new mission plan
+    def set_mission_path(self, coordList):
         rospy.wait_for_service('/mavros/mission/push')
         try:
-            success = self.waypoints_srv(waypoints=val)
+            first = True
+            wpList = []
+            for coord in coordList:
+                wp = Waypoint()
+                wp.frame = 3 # global with relative altitude(normal global uses mean sea level as alt :c)
+                wp.command = 16 # nav waypoint cmd
+                if first:
+                    wp.is_current = True
+                    first = False
+                wp.autocontinue = True
+                wp.param1 = 0 # hold time, doesnt matter for FW
+                wp.param2 = coord.acceptRad
+                wp.param3 = coord.passRad
+                wp.param4 = None
+                wp.x_lat = coord.lat
+                wp.y_long = coord.long
+                wp.z_alt = coord.alt
+                wpList.append(wp)
+            success = self.waypoints_srv(waypoints=wpList)
         except rospy.ServiceException as e:
             print("failed to update waypoint table")
 
+    # clears current mission path
     def clear_mission_path(self):
         rospy.wait_for_service('/mavros/mission/clear')
         try:
@@ -343,36 +368,36 @@ class Mavros(Autopilot):
         except rospy.ServiceException as e:
             print("failed to clear waypoint table")
 
-    #vtol takeoff and landing cmds (vtol takeoff: 84, vtol land: 85)
+    #calls mav_cmd_vtol_takeoff to takeoff using vtol mode(MC -> FW) towards next waypoint
     def takeoff(self, long, lat, alt):
         rospy.wait_for_service('/mavros/cmd/command')
         try:
-            takeoffService = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
-            successful = takeoffService(command=84, param2=1, param4=None, param5=long, param6=lat, param7=alt)
+            # 84 = MAV_CMD_VTOL_TAKEOFF code, param2 = transition heading, 1 is towards next waypoint
+            successful = self.command_long_srv(command=84, param2=1, param4=None, param5=long, param6=lat, param7=alt)
         except rospy.ServiceException as e:
-            print("failed to send takeoff cmd" % e)
+            print("failed takeoff cmd" % e)
 
-    def landing(self, long, lat, alt):
+    # calls mav_cmd_vtol_land to land using vtol mode(FW -> MC)
+    def land(self, long, lat, alt):
         rospy.wait_for_service('/mavros/cmd/command')
         try:
-            takeoffService = rospy.ServiceProxy('mavros/cmd/command', CommandLong)
-            successful = takeoffService(command=85, param1=0, param3=None, param4=None, param5=long, param6=lat, param7=None)
+            # 85 landing cmd code, param1 = land options, 0 is system default
+            successful = self.command_long_srv(command=85, param1=0, param3=None, param4=None, param5=long, param6=lat, param7=None)
         except rospy.ServiceException as e:
-            print("failed to send takeoff cmd" % e)
+            print("failed land cmd" % e)
 
     def set_offboard_mode(self):
         rospy.wait_for_service('/mavros/set_mode')
         try:
-            flightModeService = rospy.ServiceProxy('/mavros/set_mode', SetMode)
-            isModeChanged = flightModeService(custom_mode='OFFBOARD')
+            isModeChanged = self.flightModeService(custom_mode='OFFBOARD')
         except rospy.ServiceException as e:
             print("service set_mode call failed: %s. OFFBOARD Mode could not be set. Check that GPS is enabled" % e)
 
+    # sets px4 mode to mission mode, which is probably what we'll use for most of the competition
     def set_mission_mode(self):
         rospy.wait_for_service('/mavros/set_mode')
         try:
-            flightModeService = rospy.ServiceProxy('/mavros/set_mode', SetMode)
-            isModeChanged = flightModeService(custom_mode='AUTO.MISSION')
+            isModeChanged = self.flightModeService(custom_mode='AUTO.MISSION')
         except rospy.ServiceException as e:
             print("service set_mode call failed: %s. AUTO.MISSION Mode could not be set." % e)
 

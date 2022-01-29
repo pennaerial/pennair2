@@ -229,7 +229,7 @@ class UAV(object):
         self.loop_timer.start()
 
 
-class Multirotor(UAV):
+class VTOL(UAV):
     def __init__(self, autopilot, frequency=30, use_gps=True):
         """
 
