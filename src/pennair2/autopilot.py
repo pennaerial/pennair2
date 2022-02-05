@@ -384,11 +384,11 @@ class Mavros(Autopilot):
             print("failed takeoff cmd" % e)
 
     # calls mav_cmd_vtol_land to land using vtol mode(FW -> MC)
-    def vtol_land(self, longitude, lat):
+    def vtol_land(self, longitude, lat, alt):
         rospy.wait_for_service('/mavros/cmd/command')
         try:
             # 85 landing cmd code, param1 = land options, 0 is system default
-            successful = self.command_long_srv(command=85, param1=0, param3=None, param4=None, param5=longitude, param6=lat, param7=None)
+            successful = self.command_long_srv(command=85, param1=0, param3=None, param4=None, param5=longitude, param6=lat, param7=alt)
         except rospy.ServiceException as e:
             print("failed land cmd" % e)
 
