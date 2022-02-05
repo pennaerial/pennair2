@@ -257,30 +257,8 @@ class VTOL(UAV):
     def takeoff(self, longitude, latitude, altitude):
         self.vtol_takeoff(longitude, latitude, altitude)
 
-    # def takeoff(self, speed=0.5, target_height=10):
-    #     # type: (float, float) -> None
-    #     rospy.loginfo("Waiting for arm.")
-    #     self.wait_for(lambda: self.is_armed)
-    #     self.set_velocity([0, 0, 0])
-    #     rospy.sleep(0.5)
-    #     self.is_offboard = True
-    #     rospy.loginfo("Waiting for offboard.")
-    #     self.wait_for(lambda: self.is_offboard)
-    #     rospy.loginfo("Takeoff!")
-    #     self._vertical_pid(lambda: self.autopilot.relative_altitude < target_height, speed=abs(speed))
-    #     self.hover()
-
     def land(self, longitude, latitude):
         self.vtol_land(longitude, latitude)
-
-    # def land(self, speed=0.5, target=None):
-    #     # type: (float, PoseStamped) -> None
-    #     self.hover()
-    #     position = self.get_position()
-    #     rospy.sleep(1)  # wait to stabilize
-    #     position[2] = 5  # 5m above ground
-    #     self.set_position(position)
-    #     self._vertical_pid(lambda: self.is_armed, speed=-abs(speed))
 
     def _vertical_pid(self, condition, p=5.0, i=0.5, d=1.0, speed=0.0, frequency=None):
         if frequency is None:
@@ -325,3 +303,73 @@ class VTOL(UAV):
 
     def clear_mission_path(self):
         self.clear_mission_path(self)
+
+class Multirotor(UAV):
+    def __init__(self, mavros, frequency=30, use_gps=True):
+        """
+        :param autopilot: The autopilot object to use.
+        :type autopilot: Autopilot
+        """
+        UAV.__init__(self, mavros, frequency=frequency, use_gps=use_gps)
+        self.home = self.get_pose()
+
+    def hover(self):
+        self.set_position(self.get_pose())
+
+    def takeoff(self, speed=0.5, target_height=10):
+        # type: (float, float) -> None
+        rospy.loginfo("Waiting for arm.")
+        self.wait_for(lambda: self.is_armed)
+        self.set_velocity([0, 0, 0])
+        rospy.sleep(0.5)
+        self.is_offboard = True
+        rospy.loginfo("Waiting for offboard.")
+        self.wait_for(lambda: self.is_offboard)
+        rospy.loginfo("Takeoff!")
+        self._vertical_pid(lambda: self.mavros.relative_altitude < target_height, speed=abs(speed))
+        self.hover()
+
+    def land(self, speed=0.5, target=None):
+        # type: (float, PoseStamped) -> None
+        self.hover()
+        position = self.get_position()
+        rospy.sleep(1)  # wait to stabilize
+        position[2] = 5  # 5m above ground
+        self.set_position(position)
+        self._vertical_pid(lambda: self.is_armed, speed=-abs(speed))
+
+    def _vertical_pid(self, condition, p=5.0, i=0.5, d=1.0, speed=0.0, frequency=None):
+        if frequency is None:
+            frequency = self.frequency
+        location = conversions.to_numpy(self.get_pose())
+        pid_x = PID(p, i, d)
+        pid_y = PID(p, i, d)
+        pid_x.SetPoint = location[0]
+        pid_y.SetPoint = location[1]
+        pid_x.setSampleTime(1.0 / frequency)
+        pid_y.setSampleTime(1.0 / frequency)
+        rate = rospy.Rate(frequency)
+        while condition():
+            position = conversions.to_numpy(self.get_pose())
+            pid_x.update(position[0])
+            pid_y.update(position[1])
+            self.set_velocity([pid_x.output, pid_y.output, speed], "map")
+            rate.sleep()
+
+    def set_position(self, position, frame_id="map", heading=None, blocking=False, margin=0.5):
+        """Tells multirotor to fly to maintain given position.
+        :param position: The setpoint position.
+        :type position: PoseStamped | Pose | Point | list[float,float,float] | (float,float,float) | np.ndarray
+        :param frame_id: The frame relative to which the setpoint is set.
+        :type frame_id: str
+        :param heading: The heading to maintain in **radians**.
+        :type heading: float
+        :param blocking: Weather or not to block the thread until setpoint reached.
+        :type blocking: bool
+        :param margin: The setpoint margin. Only matters if blocking is true.
+        :type margin: float
+        """
+        UAV.set_position(self, position, frame_id, heading)
+        rate = rospy.Rate(self.frequency)
+        while blocking and self.distance_to_target() > margin:
+            rate.sleep()
