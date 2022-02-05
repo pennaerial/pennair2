@@ -34,6 +34,8 @@ class Autopilot:
 
         self._local_pose = None  # type: PoseStamped
         self._local_twist = None  # type: TwistStamped
+
+        self._waypoints = None  # type : Waypoint[]
         # endregion
 
     def variables_initialized(self):
@@ -169,6 +171,10 @@ class Autopilot:
     @abstractmethod
     def is_connected(self):
         pass
+
+    @property
+    def waypoints(self):
+        return deepcopy(self._waypoints)
 
 
 class Mavros(Autopilot):
@@ -369,20 +375,20 @@ class Mavros(Autopilot):
             print("failed to clear waypoint table")
 
     #calls mav_cmd_vtol_takeoff to takeoff using vtol mode(MC -> FW) towards next waypoint
-    def takeoff(self, long, lat, alt):
+    def vtol_takeoff(self, longitude, lat, alt):
         rospy.wait_for_service('/mavros/cmd/command')
         try:
             # 84 = MAV_CMD_VTOL_TAKEOFF code, param2 = transition heading, 1 is towards next waypoint
-            successful = self.command_long_srv(command=84, param2=1, param4=None, param5=long, param6=lat, param7=alt)
+            successful = self.command_long_srv(command=84, param2=1, param4=None, param5=longitude, param6=lat, param7=alt)
         except rospy.ServiceException as e:
             print("failed takeoff cmd" % e)
 
     # calls mav_cmd_vtol_land to land using vtol mode(FW -> MC)
-    def land(self, long, lat, alt):
+    def vtol_land(self, longitude, lat):
         rospy.wait_for_service('/mavros/cmd/command')
         try:
             # 85 landing cmd code, param1 = land options, 0 is system default
-            successful = self.command_long_srv(command=85, param1=0, param3=None, param4=None, param5=long, param6=lat, param7=None)
+            successful = self.command_long_srv(command=85, param1=0, param3=None, param4=None, param5=longitude, param6=lat, param7=None)
         except rospy.ServiceException as e:
             print("failed land cmd" % e)
 

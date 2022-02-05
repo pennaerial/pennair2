@@ -22,8 +22,8 @@ class UAV(object):
         VELOCITY = 2
         ACCELERATION = 3
 
-    def __init__(self, autopilot, frequency=30, use_gps=True):
-        # type: (Autopilot, float, bool) -> None
+    def __init__(self, mavros, frequency=30, use_gps=True):
+        # type: (Mavros, float, bool) -> None
         """
 
         :param autopilot: An autopilot object to use.
@@ -32,13 +32,13 @@ class UAV(object):
         __metaclass__ = ABCMeta
 
         self.frequency = float(frequency)
-        self.autopilot = autopilot
+        self.mavros = mavros
         self.tf_buffer = tf2_ros.Buffer(rospy.Duration(120))  # tf buffer length in seconds
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)  # type: tf2_ros.TransformListener
 
         rospy.loginfo("Waiting for autopilot connection.")
-        self.wait_for(self.autopilot.is_connected)
-        self.wait_for(self.autopilot.variables_initialized)
+        self.wait_for(self.mavros.is_connected)
+        self.wait_for(self.mavros.variables_initialized)
         rospy.loginfo("Connected.")
 
         self._setpoint_pos = None  # type: PoseStamped
@@ -52,35 +52,31 @@ class UAV(object):
         rospy.sleep(3.0)
 
     def __control_loop(self, event):
-        if not rospy.is_shutdown():
+        if not rospy.is_shutdown() and self.is_offboard:
             if self._setpoint_mode is UAV.SetpointMode.POSITION:
-                self.autopilot.local_pose = self._setpoint_pos
+                self.mavros.local_pose = self._setpoint_pos
             elif self._setpoint_mode is UAV.SetpointMode.VELOCITY:
-                self.autopilot.local_twist = self._setpoint_vel
+                self.mavros.local_twist = self._setpoint_vel
 
     @property
     def is_armed(self):
-        if isinstance(self.autopilot, Mavros):
-            return self.autopilot.state.armed
+        return self.mavros.state.armed
 
     @is_armed.setter
     def is_armed(self, value):
-        if isinstance(self.autopilot, Mavros):
-            self.autopilot.set_arm(value)
+        self.mavros.set_arm(value)
 
     @property
     def is_offboard(self):
-        if isinstance(self.autopilot, Mavros):
-            return self.autopilot.state.mode == "OFFBOARD"
+        return self.mavros.state.mode == "OFFBOARD"
 
     @is_offboard.setter
     def is_offboard(self, value):
-        if isinstance(self.autopilot, Mavros):
-            if not value:
-                # TODO: implement setting offboard to false
-                raise ValueError("Setting offboard to false not implemented.")
-            else:
-                self.autopilot.set_offboard_mode()
+        if not value:
+            # TODO: implement setting offboard to false
+            raise ValueError("Setting offboard to false not implemented.")
+        else:
+            self.mavros.set_offboard_mode()
 
     def wait(self, seconds, rate=30):
         rospy.sleep(seconds / rate)
@@ -90,35 +86,35 @@ class UAV(object):
             rospy.sleep(1.0 / rate)
 
     def get_gps(self):
-        return self.autopilot.global_global
+        return self.mavros.global_global
 
     def get_heading(self):
         if self.use_gps:
-            return math.pi * self.autopilot.heading / 180
+            return math.pi * self.mavros.heading / 180
         else:
             q = self.get_pose().pose.orientation
             return transformations.euler_from_quaternion([q.w, q.x, q.y, q.z], 'sxyz')[2]
 
     def get_relative_altitude(self):
-        return self.autopilot.relative_altitude
+        return self.mavros.relative_altitude
 
     def get_pose(self):
         # type: () -> PoseStamped
         if self.use_gps:
-            pose_covariance = self.autopilot.global_local
+            pose_covariance = self.mavros.global_local
             return PoseStamped(pose_covariance.header, pose_covariance.pose.pose)
         else:
-            return self.autopilot.local_pose
+            return self.mavros.local_pose
 
     def get_position(self):
         if self.use_gps:
-            pose_covariance = self.autopilot.global_local
+            pose_covariance = self.mavros.global_local
             if pose_covariance is None:
                 return None
             pose_stamped = PoseStamped(pose_covariance.header, pose_covariance.pose.pose)
             return conversions.to_numpy(pose_stamped)
         else:
-            pose_stamped = self.autopilot.local_pose
+            pose_stamped = self.mavros.local_pose
             if pose_stamped is None:
                 return None
             return to_numpy(pose_stamped)
@@ -157,7 +153,7 @@ class UAV(object):
             return None
 
     def get_twist(self):
-        return self.autopilot.local_twist
+        return self.mavros.local_twist
 
     def get_velocity(self):
         return conversions.to_numpy(self.get_twist().twist.linear)
@@ -222,6 +218,22 @@ class UAV(object):
         current = current.pose.position
         return Vector3(target.x - current.x, target.y - current.y, target.z - current.z)
 
+    def vtol_takeoff(self, longitude, lat, alt):
+        self.mavros.vtol_takeoff(self, longitude, lat, alt)
+        self.mavros.set_mission_mode(self)
+
+    def vtol_land(self, longitude, lat):
+        self.mavros.vtol_land(self, longitude, lat)
+
+    def push_mission_path(self, waypoints):
+        self.mavros.set_mission_path(self, waypoints)
+
+    def get_mission_path(self):
+        return self.mavros.waypoints
+
+    def clear_mission_path(self):
+        self.mavros.clear_mission_path(self)
+
     def shutdown(self):
         self.loop_timer.shutdown()
 
@@ -230,39 +242,45 @@ class UAV(object):
 
 
 class VTOL(UAV):
-    def __init__(self, autopilot, frequency=30, use_gps=True):
+    def __init__(self, mavros, frequency=30, use_gps=True):
         """
 
         :param autopilot: The autopilot object to use.
         :type autopilot: Autopilot
         """
-        UAV.__init__(self, autopilot, frequency=frequency, use_gps=use_gps)
+        UAV.__init__(self, mavros, frequency=frequency, use_gps=use_gps)
         self.home = self.get_pose()
 
     def hover(self):
         self.set_position(self.get_pose())
 
-    def takeoff(self, speed=0.5, target_height=10):
-        # type: (float, float) -> None
-        rospy.loginfo("Waiting for arm.")
-        self.wait_for(lambda: self.is_armed)
-        self.set_velocity([0, 0, 0])
-        rospy.sleep(0.5)
-        self.is_offboard = True
-        rospy.loginfo("Waiting for offboard.")
-        self.wait_for(lambda: self.is_offboard)
-        rospy.loginfo("Takeoff!")
-        self._vertical_pid(lambda: self.autopilot.relative_altitude < target_height, speed=abs(speed))
-        self.hover()
+    def takeoff(self, longitude, latitude, altitude):
+        self.vtol_takeoff(longitude, latitude, altitude)
 
-    def land(self, speed=0.5, target=None):
-        # type: (float, PoseStamped) -> None
-        self.hover()
-        position = self.get_position()
-        rospy.sleep(1)  # wait to stabilize
-        position[2] = 5  # 5m above ground
-        self.set_position(position)
-        self._vertical_pid(lambda: self.is_armed, speed=-abs(speed))
+    # def takeoff(self, speed=0.5, target_height=10):
+    #     # type: (float, float) -> None
+    #     rospy.loginfo("Waiting for arm.")
+    #     self.wait_for(lambda: self.is_armed)
+    #     self.set_velocity([0, 0, 0])
+    #     rospy.sleep(0.5)
+    #     self.is_offboard = True
+    #     rospy.loginfo("Waiting for offboard.")
+    #     self.wait_for(lambda: self.is_offboard)
+    #     rospy.loginfo("Takeoff!")
+    #     self._vertical_pid(lambda: self.autopilot.relative_altitude < target_height, speed=abs(speed))
+    #     self.hover()
+
+    def land(self, longitude, latitude):
+        self.vtol_land(longitude, latitude)
+
+    # def land(self, speed=0.5, target=None):
+    #     # type: (float, PoseStamped) -> None
+    #     self.hover()
+    #     position = self.get_position()
+    #     rospy.sleep(1)  # wait to stabilize
+    #     position[2] = 5  # 5m above ground
+    #     self.set_position(position)
+    #     self._vertical_pid(lambda: self.is_armed, speed=-abs(speed))
 
     def _vertical_pid(self, condition, p=5.0, i=0.5, d=1.0, speed=0.0, frequency=None):
         if frequency is None:
@@ -300,3 +318,10 @@ class VTOL(UAV):
         rate = rospy.Rate(self.frequency)
         while blocking and self.distance_to_target() > margin:
             rate.sleep()
+
+    def set_mission_path(self, waypoints):
+        if self.get_mission_path(self) != waypoints:
+            self.set_mission_path(waypoints)
+
+    def clear_mission_path(self):
+        self.clear_mission_path(self)
