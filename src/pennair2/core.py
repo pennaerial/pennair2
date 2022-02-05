@@ -304,6 +304,7 @@ class VTOL(UAV):
     def clear_mission_path(self):
         self.clear_mission_path(self)
 
+
 class Multirotor(UAV):
     def __init__(self, mavros, frequency=30, use_gps=True):
         """

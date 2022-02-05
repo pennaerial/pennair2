@@ -8,8 +8,8 @@ from copy import deepcopy
 from geometry_msgs.msg import PoseStamped, TwistStamped, PoseWithCovarianceStamped, Vector3Stamped
 from sensor_msgs.msg import NavSatFix, Imu, BatteryState
 from std_msgs.msg import Float64
-from mavros_msgs.msg import State, WaypointList, Waypoint, WaypointClear
-from mavros_msgs.srv import CommandLong, CommandInt, CommandLongRequest, CommandIntRequest, SetMode, CommandBool
+from mavros_msgs.msg import State, Waypoint
+from mavros_msgs.srv import CommandLong, CommandInt, CommandLongRequest, CommandIntRequest, SetMode, CommandBool, WaypointClear, WaypointList
 from roslaunch.scriptapi import ROSLaunch
 from roslaunch.core import Node
 from nav_msgs.msg import Odometry
