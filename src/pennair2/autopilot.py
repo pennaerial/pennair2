@@ -9,7 +9,7 @@ from geometry_msgs.msg import PoseStamped, TwistStamped, PoseWithCovarianceStamp
 from sensor_msgs.msg import NavSatFix, Imu, BatteryState
 from std_msgs.msg import Float64
 from mavros_msgs.msg import State, Waypoint, WaypointList
-from mavros_msgs.srv import CommandLong, CommandInt, CommandLongRequest, CommandIntRequest, SetMode, CommandBool, WaypointClear
+from mavros_msgs.srv import CommandLong, CommandInt, CommandLongRequest, CommandIntRequest, SetMode, CommandBool, WaypointClear, WaypointPush
 from roslaunch.scriptapi import ROSLaunch
 from roslaunch.core import Node
 from nav_msgs.msg import Odometry
@@ -277,7 +277,7 @@ class Mavros(Autopilot):
 
         # mission mode waypoint services for px4 interaction
         self.waypoints_clear = rospy.ServiceProxy(mavros_prefix + "/mission/clear", WaypointClear)
-        self.waypoints_srv = rospy.ServiceProxy(mavros_prefix + "/mission/push", WaypointList)
+        self.waypoints_srv = rospy.ServiceProxy(mavros_prefix + "/mission/push", WaypointPush)
 
         # setmode service
         self.flightModeService = rospy.ServiceProxy('/mavros/set_mode', SetMode)
