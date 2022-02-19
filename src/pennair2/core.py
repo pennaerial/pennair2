@@ -52,7 +52,7 @@ class UAV(object):
         rospy.sleep(3.0)
 
     def __control_loop(self, event):
-        if not rospy.is_shutdown() and self.is_offboard:
+        if not rospy.is_shutdown():
             if self._setpoint_mode is UAV.SetpointMode.POSITION:
                 self.mavros.local_pose = self._setpoint_pos
             elif self._setpoint_mode is UAV.SetpointMode.VELOCITY:
@@ -226,13 +226,13 @@ class UAV(object):
         self.mavros.vtol_land(self, longitude, lat)
 
     def push_mission_path(self, waypoints):
-        self.mavros.set_mission_path(self, waypoints)
+        self.mavros.set_mission_path(waypoints)
 
     def get_mission_path(self):
         return self.mavros.waypoints
 
     def clear_mission_path(self):
-        self.mavros.clear_mission_path(self)
+        self.mavros.clear_mission_path()
 
     def shutdown(self):
         self.loop_timer.shutdown()
@@ -298,11 +298,11 @@ class VTOL(UAV):
             rate.sleep()
 
     def set_mission_path(self, waypoints):
-        if self.get_mission_path(self) != waypoints:
+        if self.get_mission_path() != waypoints:
             self.set_mission_path(waypoints)
 
     def clear_mission_path(self):
-        self.clear_mission_path(self)
+        self.clear_mission_path()
 
 
 class Multirotor(UAV):
@@ -374,3 +374,10 @@ class Multirotor(UAV):
         rate = rospy.Rate(self.frequency)
         while blocking and self.distance_to_target() > margin:
             rate.sleep()
+
+    def set_mission_path(self, waypoints):
+        if self.get_mission_path() != waypoints:
+            self.push_mission_path(waypoints)
+
+    def clear_mission_path(self):
+        self.clear_mission_path()

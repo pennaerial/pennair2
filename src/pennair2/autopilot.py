@@ -277,7 +277,7 @@ class Mavros(Autopilot):
 
         # mission mode waypoint services for px4 interaction
         self.waypoints_clear = rospy.ServiceProxy(mavros_prefix + "/mission/clear", WaypointClear)
-        self.waypoints_srv = rospy.ServiceProxy(mavros_prefix + "/mission/push", WaypointPush)
+        self.waypoints_srv = rospy.ServiceProxy(mavros_prefix + "/mission/push", WaypointPush, persistent=True)
 
         # setmode service
         self.flightModeService = rospy.ServiceProxy('/mavros/set_mode', SetMode)
@@ -354,13 +354,13 @@ class Mavros(Autopilot):
                     wp.is_current = True
                     first = False
                 wp.autocontinue = True
-                wp.param1 = 0 # hold time, doesnt matter for FW
-                wp.param2 = coord.acceptRad
-                wp.param3 = coord.passRad
-                wp.param4 = None
-                wp.x_lat = coord.lat
-                wp.y_long = coord.long
-                wp.z_alt = coord.alt
+                wp.param1 = 0.0 # hold time, doesnt matter for FW
+                wp.param2 = coord["acceptRad"]
+                wp.param3 = coord["passRad"]
+                wp.param4 = float("NaN")
+                wp.x_lat = coord["lat"]
+                wp.y_long = coord["long"]
+                wp.z_alt = coord["alt"]
                 wpList.append(wp)
             success = self.waypoints_srv(waypoints=wpList)
         except rospy.ServiceException as e:
